@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://ajdelgados.com/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://ajdelgados.com/blog/react-con-aws-cognito-para-autenticacion-de-usuario.html</loc>
+    <lastmod>2020-10-28</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ajdelgados.com/blog/mautic-en-aws-instalacion-con-nginx.html</loc>
+    <lastmod>2020-09-16</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ajdelgados.com/blog/nestjs-con-aws-secrets-manager.html</loc>
+    <lastmod>2020-05-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ajdelgados.com/blog/golang-graphql-para-una-api-usando-postgresql.html</loc>
+    <lastmod>2020-05-07</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>

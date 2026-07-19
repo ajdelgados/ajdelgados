@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KFW5JJ3DJT"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-KFW5JJ3DJT');
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Software Developer en acción - Arturo J. Delgado S.</title>
+  <meta name="description" content="Arturo J. Delgado S. — Software Developer & Software Architect. Blog sobre AWS, React, NestJS, Golang, GraphQL y más.">
+  <link rel="canonical" href="https://ajdelgados.com/">
+  <meta name="author" content="Arturo J. Delgado S.">
+  <meta name="keywords" content="Arturo Delgado, Software Developer, Software Architect, AWS, React, NestJS, Golang, GraphQL, blog">
+  <meta name="robots" content="index, follow">
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="AJDELGADOS">
+  <meta property="og:locale" content="es_ES">
+  <meta property="og:title" content="Software Developer en acción - Arturo J. Delgado S.">
+  <meta property="og:description" content="Arturo J. Delgado S. — Software Developer &amp; Software Architect. Blog sobre AWS, React, NestJS, Golang, GraphQL y más.">
+  <meta property="og:url" content="https://ajdelgados.com/">
+  <meta property="og:image" content="https://ajdelgados.com/assets/og-home.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@ajdelgados">
+  <meta name="twitter:title" content="Software Developer en acción - Arturo J. Delgado S.">
+  <meta name="twitter:description" content="Arturo J. Delgado S. — Software Developer &amp; Software Architect. Blog sobre AWS, React, NestJS, Golang, GraphQL y más.">
+  <meta name="twitter:image" content="https://ajdelgados.com/assets/og-home.png">
+  <link rel="icon" href="assets/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" href="assets/favicon-192x192.png" sizes="192x192">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <style>
+    :root {
+      --accent: #80abc8;
+      --accent-dark: #5f90b0;
+      --dark: #2d3033;
+      --text: #616161;
+      --heading: #333;
+      --bg: #ffffff;
+      --light: #f7f7f7;
+      --border: #ededed;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+    a { color: var(--accent); text-decoration: none; transition: color .2s; }
+    a:hover { color: var(--accent-dark); }
+    h1, h2, h3 { color: var(--heading); font-weight: 600; line-height: 1.3; }
+    .container { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+
+    /* Header */
+    header.site-header {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .header-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 0;
+    }
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .logo {
+      width: 56px; height: 56px; border-radius: 6px;
+      display: block; object-fit: contain;
+    }
+    #header-text { padding-right: 20px; }
+    #site-title { font-size: 20px; font-weight: 700; letter-spacing: 1px; margin: 0; }
+    #site-title a { color: var(--dark); }
+    #site-title a:hover { color: var(--accent); }
+    #site-description { font-size: 13px; color: #999; margin: 0; }
+    .header-right { display: flex; align-items: center; gap: 28px; }
+    nav ul { list-style: none; display: flex; gap: 28px; }
+    nav a { color: var(--dark); font-size: 14px; font-weight: 500; text-transform: uppercase; letter-spacing: .5px; }
+    nav a:hover { color: var(--accent); }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, #2d3033 0%, #1f2225 100%);
+      color: #fff; text-align: center; padding: 90px 20px;
+    }
+    .hero h1 { color: #fff; font-size: 40px; margin-bottom: 16px; }
+    .hero p { font-size: 18px; color: #c9cccf; max-width: 680px; margin: 0 auto; }
+    .hero .accent { color: var(--accent); }
+
+    /* Sections */
+    section { padding: 70px 0; }
+    .section-title { text-align: center; margin-bottom: 10px; font-size: 28px; }
+    .section-title + .section-sub { text-align: center; color: #999; margin-bottom: 50px; }
+    .divider { width: 50px; height: 3px; background: var(--accent); margin: 14px auto 40px; border: 0; }
+
+    /* Feature columns */
+    .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+    .feature { text-align: center; }
+    .feature .icon {
+      width: 100px; height: 100px; border-radius: 50%;
+      border: 2px solid #f8f8f8; margin: 0 auto 20px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background-color .25s ease-in-out;
+    }
+    .feature .icon i { font-size: 36px; color: var(--accent); transition: color .25s ease-in-out; }
+    .feature .icon:hover { background-color: var(--accent); }
+    .feature .icon:hover i { color: #fff; }
+    .feature h3 { margin-bottom: 10px; font-size: 18px; }
+
+    /* Blog */
+    .blog { background: var(--light); }
+    .posts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; }
+    .post {
+      background: #fff; border: 1px solid var(--border); border-radius: 6px;
+      padding: 28px; transition: box-shadow .2s;
+    }
+    .post:hover { box-shadow: 0 6px 22px rgba(0,0,0,.08); }
+    .post h3 { margin-bottom: 12px; font-size: 18px; }
+    .post h3 a { color: var(--heading); }
+    .post h3 a:hover { color: var(--accent); }
+    .post p { margin-bottom: 16px; }
+    .read-more { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+
+    /* Social icons */
+    .social { display: flex; justify-content: center; align-items: center; gap: 12px; margin-bottom: 18px; }
+    .social a {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(255,255,255,.1); color: #fff; font-size: 16px;
+      transition: background-color .25s ease-in-out;
+    }
+    .social a:hover { background: var(--accent); color: #fff; }
+
+    /* Footer */
+    footer.site-footer {
+      background: var(--dark); color: #aeb2b5; text-align: center;
+      padding: 30px 20px; font-size: 13px;
+    }
+    footer a { color: var(--accent); }
+
+    @media (max-width: 768px) {
+      .header-inner { flex-direction: column; gap: 16px; }
+      .features, .posts { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 30px; }
+    }
+  </style>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "AJDELGADOS",
+  "url": "https://ajdelgados.com",
+  "inLanguage": "es",
+  "author": {
+    "@type": "Person",
+    "name": "Arturo J. Delgado S.",
+    "jobTitle": "Software Developer & Software Architect",
+    "url": "https://ajdelgados.com",
+    "sameAs": [
+      "https://www.linkedin.com/in/ajdelgados",
+      "https://www.facebook.com/ajdelgados",
+      "https://www.twitter.com/ajdelgados"
+    ]
+  }
+}
+  </script>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand">
+        <img class="logo" src="assets/logo_60x60.png" alt="AJDELGADOS" width="56" height="56">
+        <div id="header-text">
+          <div id="site-title"><a href="#inicio">AJDELGADOS</a></div>
+          <p id="site-description">Arturo J. Delgado S.</p>
+        </div>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="#inicio">Inicio</a></li>
+          <li><a href="#blog">Blog</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero" id="inicio">
+    <div class="container">
+      <h1>Hola, soy <span class="accent">Arturo</span></h1>
+      <p>Software Developer y Software Architect apasionado por mi profesión. Ayudo a organizaciones y personas a construir sistemas de información eficientes.</p>
+    </div>
+  </section>
+
+  <section id="sobre-mi">
+    <div class="container">
+      <h2 class="section-title">Sobre mí</h2>
+      <hr class="divider">
+      <div class="features">
+        <div class="feature">
+          <div class="icon"><i class="fa fa-aw fa-bolt fa-3x"></i></div>
+          <h3>Ágil</h3>
+          <p>Prefiero las metodologías ágiles para construir soluciones simples, rápidas y modulares.</p>
+        </div>
+        <div class="feature">
+          <div class="icon"><i class="fa fa-aw fa-microchip fa-3x"></i></div>
+          <h3>Innovador</h3>
+          <p>Investigo nuevas tecnologías para diseñar mejores soluciones a los problemas.</p>
+        </div>
+        <div class="feature">
+          <div class="icon"><i class="fa fa-aw fa-cubes fa-3x"></i></div>
+          <h3>Lógico</h3>
+          <p>Apoyo la madurez de los procesos basándome en la Teoría de Sistemas.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="blog" id="blog">
+    <div class="container">
+      <h2 class="section-title">Lo último del Blog</h2>
+      <hr class="divider">
+      <div class="posts">
+        <article class="post">
+          <h3><a href="blog/react-con-aws-cognito-para-autenticacion-de-usuario.html">React con AWS Cognito para autenticación de usuario</a></h3>
+          <p>Cómo integrar AWS Cognito en una aplicación React para gestionar la autenticación de usuarios de forma segura.</p>
+          <a class="read-more" href="blog/react-con-aws-cognito-para-autenticacion-de-usuario.html">Leer más →</a>
+        </article>
+        <article class="post">
+          <h3><a href="blog/mautic-en-aws-instalacion-con-nginx.html">Mautic en AWS instalación con Nginx</a></h3>
+          <p>Guía para instalar y configurar Mautic sobre AWS utilizando Nginx como servidor web.</p>
+          <a class="read-more" href="blog/mautic-en-aws-instalacion-con-nginx.html">Leer más →</a>
+        </article>
+        <article class="post">
+          <h3><a href="blog/nestjs-con-aws-secrets-manager.html">NestJS con AWS Secrets Manager</a></h3>
+          <p>Integrando AWS Secrets Manager en una aplicación NestJS para manejar credenciales de forma segura.</p>
+          <a class="read-more" href="blog/nestjs-con-aws-secrets-manager.html">Leer más →</a>
+        </article>
+        <article class="post">
+          <h3><a href="blog/golang-graphql-para-una-api-usando-postgresql.html">Golang GraphQL para una API usando PostgreSQL</a></h3>
+          <p>Construyendo una API GraphQL en Go conectada a una base de datos PostgreSQL.</p>
+          <a class="read-more" href="blog/golang-graphql-para-una-api-usando-postgresql.html">Leer más →</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="social">
+        <a href="https://www.linkedin.com/in/ajdelgados" title="LinkedIn" aria-label="LinkedIn"><i class="fa fa-linkedin"></i></a>
+        <a href="https://www.facebook.com/ajdelgados" title="Facebook" aria-label="Facebook"><i class="fa fa-facebook"></i></a>
+        <a href="https://www.twitter.com/ajdelgados" title="Twitter" aria-label="Twitter"><i class="fa fa-twitter"></i></a>
+      </div>
+      Copyright © 2026 AJDELGADOS. Todos los derechos reservados.
+    </div>
+  </footer>
+
+</body>
+</html>

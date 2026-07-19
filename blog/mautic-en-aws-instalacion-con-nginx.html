@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KFW5JJ3DJT"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-KFW5JJ3DJT');
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mautic en AWS instalación con Nginx — AJDELGADOS</title>
+  <meta name="description" content="Guía para instalar y configurar Mautic sobre AWS utilizando Nginx, PHP, MySQL y Composer.">
+  <link rel="canonical" href="https://ajdelgados.com/blog/mautic-en-aws-instalacion-con-nginx.html">
+  <meta name="author" content="Arturo J. Delgado S.">
+  <meta name="keywords" content="Mautic, AWS, Nginx, PHP, MySQL, Composer, marketing automation">
+  <meta name="robots" content="index, follow">
+  <!-- Open Graph -->
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="AJDELGADOS">
+  <meta property="og:locale" content="es_ES">
+  <meta property="og:title" content="Mautic en AWS instalación con Nginx">
+  <meta property="og:description" content="Guía para instalar y configurar Mautic sobre AWS utilizando Nginx, PHP, MySQL y Composer.">
+  <meta property="og:url" content="https://ajdelgados.com/blog/mautic-en-aws-instalacion-con-nginx.html">
+  <meta property="og:image" content="https://ajdelgados.com/assets/mautic-en-aws-instalacion-con-nginx/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="article:published_time" content="2020-09-16">
+  <meta property="article:author" content="Arturo J. Delgado S.">
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@ajdelgados">
+  <meta name="twitter:title" content="Mautic en AWS instalación con Nginx">
+  <meta name="twitter:description" content="Guía para instalar y configurar Mautic sobre AWS utilizando Nginx, PHP, MySQL y Composer.">
+  <meta name="twitter:image" content="https://ajdelgados.com/assets/mautic-en-aws-instalacion-con-nginx/og.png">
+  <link rel="icon" href="../assets/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" href="../assets/favicon-192x192.png" sizes="192x192">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <style>
+    :root {
+      --accent: #80abc8;
+      --accent-dark: #5f90b0;
+      --dark: #2d3033;
+      --text: #616161;
+      --heading: #333;
+      --bg: #ffffff;
+      --light: #f7f7f7;
+      --border: #ededed;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+    a { color: var(--accent); text-decoration: none; transition: color .2s; }
+    a:hover { color: var(--accent-dark); }
+    h1, h2, h3, h4, h5 { color: var(--heading); font-weight: 600; line-height: 1.3; }
+    .container { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+
+    /* Header */
+    header.site-header {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .header-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 0;
+    }
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .logo { width: 56px; height: 56px; border-radius: 6px; display: block; object-fit: contain; }
+    #header-text { padding-right: 20px; }
+    #site-title { font-size: 20px; font-weight: 700; letter-spacing: 1px; margin: 0; }
+    #site-title a { color: var(--dark); }
+    #site-title a:hover { color: var(--accent); }
+    #site-description { font-size: 13px; color: #999; margin: 0; }
+    nav ul { list-style: none; display: flex; gap: 28px; }
+    nav a { color: var(--dark); font-size: 14px; font-weight: 500; text-transform: uppercase; letter-spacing: .5px; }
+    nav a:hover { color: var(--accent); }
+
+    /* Article */
+    .article-header { background: linear-gradient(135deg, #2d3033 0%, #1f2225 100%); color: #fff; padding: 70px 20px; text-align: center; }
+    .article-header h1 { color: #fff; font-size: 34px; max-width: 820px; margin: 0 auto 14px; }
+    .article-header .meta { color: #c9cccf; font-size: 14px; }
+    article.post-content { max-width: 820px; margin: 0 auto; padding: 60px 20px; }
+    article.post-content p { margin-bottom: 22px; }
+    article.post-content h2 { font-size: 26px; margin: 44px 0 18px; }
+    article.post-content h3 { font-size: 21px; margin: 36px 0 14px; }
+    article.post-content h5 { font-size: 16px; margin: 28px 0 12px; }
+    article.post-content ul, article.post-content ol { margin: 0 0 22px 24px; }
+    article.post-content li { margin-bottom: 8px; }
+    article.post-content figure { margin: 30px 0; text-align: center; }
+    article.post-content figure img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 6px; }
+    article.post-content pre {
+      background: #2d3033; color: #f2f2f2; padding: 20px; border-radius: 6px;
+      overflow-x: auto; margin: 0 0 22px; font-size: 13.5px; line-height: 1.55;
+    }
+    article.post-content pre code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
+    article.post-content code { font-family: "SFMono-Regular", Consolas, Menlo, monospace; }
+    .back-link { display: inline-block; margin-bottom: 30px; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+    .post-tags { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 14px; color: #999; }
+
+    /* Footer */
+    footer.site-footer { background: var(--dark); color: #aeb2b5; text-align: center; padding: 30px 20px; font-size: 13px; }
+    footer a { color: var(--accent); }
+    .social { display: flex; justify-content: center; align-items: center; gap: 12px; margin-bottom: 18px; }
+    .social a { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,.1); color: #fff; font-size: 16px; transition: background-color .25s ease-in-out; }
+    .social a:hover { background: var(--accent); color: #fff; }
+
+    @media (max-width: 768px) {
+      .header-inner { flex-direction: column; gap: 16px; }
+      .article-header h1 { font-size: 26px; }
+    }
+  </style>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Mautic en AWS instalación con Nginx",
+  "description": "Guía para instalar y configurar Mautic sobre AWS utilizando Nginx, PHP, MySQL y Composer.",
+  "image": "https://ajdelgados.com/assets/mautic-en-aws-instalacion-con-nginx/Screen-Shot-2020-09-18-at-23.13.26.png",
+  "datePublished": "2020-09-16",
+  "dateModified": "2020-09-16",
+  "inLanguage": "es",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://ajdelgados.com/blog/mautic-en-aws-instalacion-con-nginx.html"
+  },
+  "author": {
+    "@type": "Person",
+    "name": "Arturo J. Delgado S.",
+    "url": "https://ajdelgados.com"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Arturo J. Delgado S.",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://ajdelgados.com/assets/logo_60x60.png"
+    }
+  }
+}
+  </script>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand">
+        <img class="logo" src="../assets/logo_60x60.png" alt="AJDELGADOS" width="56" height="56">
+        <div id="header-text">
+          <div id="site-title"><a href="../index.html">AJDELGADOS</a></div>
+          <p id="site-description">Arturo J. Delgado S.</p>
+        </div>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="../index.html#inicio">Inicio</a></li>
+          <li><a href="../index.html#blog">Blog</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div class="article-header">
+    <div class="container">
+      <h1>Mautic en AWS instalación con Nginx</h1>
+      <p class="meta">Publicado el 16 de septiembre de 2020 &middot; por Arturo J. Delgado S.</p>
+    </div>
+  </div>
+
+  <article class="post-content">
+    <a class="back-link" href="../index.html#blog">&larr; Volver al blog</a>
+
+<p>Mautic en AWS es una publicación para instalar el software que te permite automatizar el proceso de marketing de una organización en una EC2. En esta publicación voy a desplegar Mautic sobre un EC2 de AWS con la imagen de Ubuntu 18.04.</p>
+
+<p>En primer lugar, se deberá instalar Nginx (servidor web), PHP (lenguaje de programación) y MySQL (base de datos), que son los necesarios para Mautic. También les colocaré los comandos y configuraciones necesarias para realizar el adecuado despliegue de Mautic.</p>
+
+<h2>Prerrequisitos y consideraciones</h2>
+
+<p>No se explicara cómo iniciar un EC2 en AWS, puedes consultar la documentación de <a rel="noreferrer noopener" href="https://aws.amazon.com/es/ec2/getting-started/" target="_blank">AWS</a> para tener mayor información. El tipo de instancia dependerá de las peticiones que se le harán a Mautic, para la explicación en esta publicacion se usó una t2.micro con la imagen Ubuntu 18.04 y disco duro (storage) de 8GB SSD (gp2).</p>
+
+<p>Debes tener las credenciales necesarias para ingresar en el EC2 y saber un manejo básico de una consola Linux en Ubuntu 18.04</p>
+
+<h2>Instalando Nginx, PHP, Composer y MySQL</h2>
+
+<p>Estando dentro del EC2 en AWS, se deberán actualizar los paquetes que tenemos en el EC2</p>
+
+<pre class="wp-block-code"><code>$ sudo apt update</code></pre>
+
+<p>Después se deberá instalar Nginx, PHP y MySQL con </p>
+
+<pre class="wp-block-code"><code>$ sudo apt install nginx php-fpm php-mysql php-curl \
+    php-xml mysql-server php-zip php-imap php-bcmath \
+    php-mbstring php-gd php-intl</code></pre>
+
+<p> Se instalará composer para gestionar los paquetes de PHP en el proyecto Mautic</p>
+
+<pre class="wp-block-code"><code>$ curl -sS https://getcomposer.org/installer -o composer-setup.php
+$ sudo php composer-setup.php --install-dir=/usr/local/bin --filename=composer</code></pre>
+
+<p>Los pasos anteriores fueron para instalar los requerimientos de Mautic, en las siguientes secciones se usaran o configuraran estos requerimientos.</p>
+
+<h2>Clonar el repositorio de Mautic e instalación de dependencias</h2>
+
+<p>Se clonara por git el repositorio de Mautic</p>
+
+<pre class="wp-block-code"><code>$ git clone https://github.com/mautic/mautic.git</code></pre>
+
+<p>Luego se debe instalar las dependencias del proyecto Mautic con Composer (el manejador de dependencias de PHP) y crear los directorios de cache y logs para el proyecto</p>
+
+<pre class="wp-block-code"><code>$ cd mautic
+$ sudo -H composer self-update 1.10.17
+$ composer install
+$ mkdir app/cache app/logs</code></pre>
+
+<p>Asignar los permisos necesarios al directorio que fue clonado</p>
+
+<pre class="wp-block-code"><code>$ sudo chown -R www-data:www-data .
+$ sudo find . -type d -not -perm 755 -exec chmod 755 {} +
+$ sudo find . -type f -not -perm 644 -exec chmod 644 {} +
+$ sudo chmod -R g+w app/cache/ app/logs/ app/config/
+$ sudo chmod -R g+w media/files/ media/images/ translations/</code></pre>
+
+<p>En esta sección se configuro Mautic en un directorio, en la siguiente sección se configurara la base de datos MySQL.</p>
+
+<h2>Base de Datos MySQL para Mautic</h2>
+
+<p>Se deberá crear la base de datos y un usuario en MySQL. Y con la instalación por defecto se prodrá ingresar a la base de datos</p>
+
+<pre class="wp-block-code"><code>$ sudo mysql</code></pre>
+
+<p>Dentro de MySQL se deberá ejecutar los siguientes comandos de base datos, para crear la base de datos y el usuario que se usará para Mautic</p>
+
+<pre class="wp-block-code"><code>mysql> CREATE DATABASE mautic;
+mysql> CREATE USER 'mautic'@'localhost' IDENTIFIED WITH mysql_native_password BY 'mautic';
+mysql> GRANT ALL PRIVILEGES ON mautic.* TO 'mautic'@'localhost';
+mysql> FLUSH PRIVILEGES;</code></pre>
+
+<p>Ya se tiene creada la base de datos y un usuario para Mautic, en la siguiente sección se configurará Nginx para responder a las peticiones web.</p>
+
+<h2>Servidor Web Nginx para Mautic</h2>
+
+<p>El paso siguiente será configurar Nginx para procesar peticiones con PHP. Para esto se requiere crear un archivo de configuración /etc/nginx/sites-available/mautic con lo siguiente</p>
+
+<div class="wp-block-group"><div class="wp-block-group__inner-container is-layout-flow wp-block-group-is-layout-flow">
+<pre><code>server {
+  listen 80 default_server;
+  listen [::]:80 default_server;
+
+  root /home/ubuntu/mautic;
+  index index.php index.html index.htm index.nginx-debian.html;
+  server_name _;
+
+  location / {
+    try_files $uri $uri/ /index.php?$args;
+  }
+
+  location ~ \.php$ {
+    include snippets/fastcgi-php.conf;
+    fastcgi_pass unix:/run/php/php7.2-fpm.sock;
+  }
+}</code></pre>
+</div></div>
+
+<p>Luego se debe borrar la configuración por defecto de Nginx, colocar la nueva configuración de Mautic para Nginx y recargar la instalación</p>
+
+<pre class="wp-block-code"><code>$ sudo rm /etc/nginx/sites-enabled/default
+$ sudo ln -s /etc/nginx/sites-available/mautic /etc/nginx/sites-enabled/
+$ sudo nginx -s reload</code></pre>
+
+<p>Estas son las configuraciones básicas para el EC2. Se procede a iniciar la parte final de la instalación visitando la IP del sistema Mautic.</p>
+
+<h2>Configuración Mautic en AWS</h2>
+
+<p>Mautic en AWS ya se encuentra disponible, se necesita ir a la IP pública del servidor EC2 y terminar la instalación</p>
+
+<figure><img src="../assets/mautic-en-aws-instalacion-con-nginx/Screen-Shot-2020-09-18-at-23.13.26.png" alt="Primera visita al sistema Mautic en AWS" loading="lazy"><figcaption>Primera visita al sistema</figcaption></figure>
+
+<p>Se coloca el nombre de usuario, contraseña y nombre de la base de datos. En la publicación se coloco &#8220;mautic&#8221; para el nombre de usuario, contraseña y base de datos</p>
+
+<figure><img src="../assets/mautic-en-aws-instalacion-con-nginx/Screen-Shot-2020-09-18-at-23.24.53.png" alt="Configuración de la base de datos" loading="lazy"><figcaption>Configuración de la base de datos</figcaption></figure>
+
+<p>Indicamos el usuario, contraseña y correo electrónico a ser creado para administrar la aplicación</p>
+
+<figure><img src="../assets/mautic-en-aws-instalacion-con-nginx/Screen-Shot-2020-09-18-at-23.29.08.png" alt="Crear usuario para Mautic" loading="lazy"><figcaption>Crear usuario para Mautic</figcaption></figure>
+
+<p>Se podría configurar la cuenta de correo electrónico para enviar los correos electrónicos en los procesos de marketing.</p>
+
+<figure><img src="../assets/mautic-en-aws-instalacion-con-nginx/Screen-Shot-2020-09-18-at-23.32.07.png" alt="Configuración de coreo electrónico" loading="lazy"><figcaption>Configuración de coreo electrónico</figcaption></figure>
+
+<p>Llegamos al paso final, Mautic está completamente instalado en el EC2 de AWS con las configuraciones básicas. Procedemos a generar los trabajos programados para ejecutar Mautic en AWS</p>
+
+<h2>Las tareas programadas de Mautic</h2>
+
+<p>Se debe ejecutar diferentes tareas cada cierto tiempo en Mautic, por eso se procede a crear distintos registros en el crontab del Ubuntu</p>
+
+<pre class="wp-block-code"><code>$ (sudo crontab -l 2>/dev/null; echo "0,15,30,45 * * * * php /home/ubuntu/mautic/bin/console mautic:segments:update") | sudo crontab -
+$ (sudo crontab -l 2>/dev/null; echo "5,20,35,50 * * * * php /home/ubuntu/mautic/bin/console mautic:campaigns:update") | sudo crontab -
+$ (sudo crontab -l 2>/dev/null; echo "10,25,40,55 * * * * php /home/ubuntu/mautic/bin/console mautic:campaigns:trigger") | sudo crontab -</code></pre>
+
+<p></p>
+    <p class="post-tags"><strong>Etiquetado en:</strong> AWS &middot; Composer &middot; Mautic &middot; MySQL &middot; Nginx &middot; PHP</p>
+    <p><a class="back-link" href="../index.html#blog">&larr; Volver al blog</a></p>
+
+  </article>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="social">
+        <a href="https://www.linkedin.com/in/ajdelgados" title="LinkedIn" aria-label="LinkedIn"><i class="fa fa-linkedin"></i></a>
+        <a href="https://www.facebook.com/ajdelgados" title="Facebook" aria-label="Facebook"><i class="fa fa-facebook"></i></a>
+        <a href="https://www.twitter.com/ajdelgados" title="Twitter" aria-label="Twitter"><i class="fa fa-twitter"></i></a>
+      </div>
+      Copyright &copy; 2026 AJDELGADOS. Todos los derechos reservados.
+    </div>
+  </footer>
+
+</body>
+</html>
