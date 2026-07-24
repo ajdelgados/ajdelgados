@@ -2,7 +2,7 @@
 
 Personal static site (portfolio + blog) for Arturo J. Delgado S., meant to be
 deployed on **GitHub Pages with a custom domain** (`ajdelgados.com`). It's a
-replica of the old WordPress site (Ample theme by ThemeGrill), rebuilt as plain
+replica of the old WordPress site, rebuilt as plain
 HTML with no framework and no build step.
 
 ## Project structure
@@ -34,13 +34,14 @@ ajdelgados/
 
 ## Style (design system)
 
-The look comes from the Ample theme. All values live in each page's inline `<style>`
+All values live in each page's inline `<style>`
 (there is no external CSS). CSS variables in `:root`:
 
 | Variable | Value | Use |
 |---|---|---|
-| `--accent` | `#80abc8` | Primary color (links, buttons, hovers) — Ample theme's steel-blue |
-| `--accent-dark` | `#5f90b0` | Link hover |
+| `--accent` | `#80abc8` | Steel-blue — used on dark surfaces (footer/hero) and non-text UI (divider, icon fills, hover backgrounds), where it passes contrast |
+| `--link` | `#3f7597` | Link/interactive text on light surfaces — darker sibling that passes WCAG AA (5.0:1 on white) |
+| `--link-hover` | `#2b5e80` | Link, nav, and title hover on light surfaces (6.96:1 on white) |
 | `--dark` | `#2d3033` | Dark header/footer, heading text |
 | `--text` | `#616161` | Body text |
 | `--heading` | `#333` | Headings |
@@ -79,7 +80,10 @@ right after `<meta charset="UTF-8">`, as high as possible in `<head>`:
 ## SEO
 
 Every page carries a full SEO layer. Site-wide files at the root: **`sitemap.xml`**
-(lists every URL) and **`robots.txt`** (allows all crawlers, points to the sitemap).
+(lists every URL), **`robots.txt`** (allows all crawlers, points to the sitemap), and
+**`llms.txt`** (a Markdown map of the site for LLMs — the proposed llmstxt.org format:
+an `# H1` title, a `>` blockquote summary, and a `## Blog` list of every post as
+`[title](absolute-url): description`).
 
 Each page's `<head>` includes, right after `<meta name="description">`:
 
@@ -178,17 +182,20 @@ The existing posts were migrated from WordPress. The process to migrate/create o
 10. **Add the URL to `sitemap.xml`** — a new `<url>` block with `<loc>` (absolute URL),
     `<lastmod>` (post date), `<changefreq>yearly</changefreq>`, `<priority>0.8</priority>`.
 
-11. **Update `README.md`.** The README (GitHub profile, in English) mentions the blog topics
+11. **Add the post to `llms.txt`** — a new bullet under `## Blog`:
+    `- [<title>](https://ajdelgados.com/blog/<slug>.html): <description>`.
+
+12. **Update `README.md`.** The README (GitHub profile, in English) mentions the blog topics
     in the *"Read my blog about …"* line. If the new article introduces a technology/topic
     not yet listed, add it to keep the list current.
 
-12. **Verify** before finishing:
+13. **Verify** before finishing:
     - Every path (`../assets/…`, `../index.html`, the `og.png`) resolves to existing files.
     - `<article>` opens and closes exactly once; exactly one rendered `<h1>`.
     - Zero unescaped tags inside code blocks.
     - The Google Analytics tag is present.
     - Canonical + OG + Twitter + JSON-LD present; JSON-LD parses as valid JSON.
-    - The post is listed in `sitemap.xml`.
+    - The post is listed in both `sitemap.xml` and `llms.txt`.
 
 ## Post page structure
 
