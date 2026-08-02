@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KFW5JJ3DJT"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-KFW5JJ3DJT');
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diagnóstico de cámara Hikvision por RTSP — AJDELGADOS</title>
+  <meta name="description" content="Diagnóstico y troubleshooting RTSP de una cámara Hikvision: pérdida de paquetes por la fuente, error 401 Digest y video en vivo con ffplay forzando TCP.">
+  <link rel="canonical" href="https://ajdelgados.com/blog/diagnostico-de-camara-hikvision-por-rtsp.html">
+  <meta name="author" content="Arturo J. Delgado S.">
+  <meta name="keywords" content="Hikvision, RTSP, qué es RTSP, RTP, ffmpeg, ffplay, ffprobe, ISAPI, H.264, redes, pérdida de paquetes, cámaras IP, troubleshooting">
+  <meta name="robots" content="index, follow">
+  <!-- Open Graph -->
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="AJDELGADOS">
+  <meta property="og:locale" content="es_ES">
+  <meta property="og:title" content="Diagnóstico de cámara Hikvision por RTSP">
+  <meta property="og:description" content="Diagnóstico y troubleshooting RTSP de una cámara Hikvision: pérdida de paquetes por la fuente, error 401 Digest y video en vivo con ffplay forzando TCP.">
+  <meta property="og:url" content="https://ajdelgados.com/blog/diagnostico-de-camara-hikvision-por-rtsp.html">
+  <meta property="og:image" content="https://ajdelgados.com/assets/diagnostico-de-camara-hikvision-por-rtsp/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="article:published_time" content="2026-08-02">
+  <meta property="article:author" content="Arturo J. Delgado S.">
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@ajdelgados">
+  <meta name="twitter:title" content="Diagnóstico de cámara Hikvision por RTSP">
+  <meta name="twitter:description" content="Diagnóstico y troubleshooting RTSP de una cámara Hikvision: pérdida de paquetes por la fuente, error 401 Digest y video en vivo con ffplay forzando TCP.">
+  <meta name="twitter:image" content="https://ajdelgados.com/assets/diagnostico-de-camara-hikvision-por-rtsp/og.png">
+  <link rel="icon" href="../assets/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" href="../assets/favicon-192x192.png" sizes="192x192">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <style>
+    :root {
+      --accent: #80abc8;
+      --link: #3f7597;
+      --link-hover: #2b5e80;
+      --dark: #2d3033;
+      --text: #616161;
+      --heading: #333;
+      --bg: #ffffff;
+      --light: #f7f7f7;
+      --border: #ededed;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+    a { color: var(--link); text-decoration: none; transition: color .2s; }
+    a:hover { color: var(--link-hover); }
+    h1, h2, h3, h4, h5 { color: var(--heading); font-weight: 600; line-height: 1.3; }
+    .container { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+
+    /* Skip link — first focusable element, hidden until focused */
+    .skip-link {
+      position: absolute; left: 8px; top: -56px; z-index: 200;
+      background: var(--dark); color: #fff; padding: 10px 18px;
+      border-radius: 0 0 6px 6px; font-size: 14px; font-weight: 600;
+      transition: top .2s;
+    }
+    .skip-link:focus { top: 0; color: #fff; }
+
+    /* Visible keyboard focus (brand-colored, not mouse clicks) */
+    :focus-visible { outline: 2px solid var(--link); outline-offset: 3px; border-radius: 3px; }
+    footer a:focus-visible, .social a:focus-visible { outline-color: var(--accent); }
+
+    /* Header */
+    header.site-header {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .header-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 0;
+    }
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .logo { width: 56px; height: 56px; border-radius: 6px; display: block; object-fit: contain; }
+    #header-text { padding-right: 20px; }
+    #site-title { font-size: 20px; font-weight: 700; letter-spacing: 1px; margin: 0; }
+    #site-title a { color: var(--dark); }
+    #site-title a:hover { color: var(--link-hover); }
+    #site-description { font-size: 13px; color: #999; margin: 0; }
+    nav ul { list-style: none; display: flex; gap: 28px; }
+    nav a { color: var(--dark); font-size: 14px; font-weight: 500; text-transform: uppercase; letter-spacing: .5px; }
+    nav a:hover { color: var(--link-hover); }
+
+    /* Article */
+    .article-header { background: linear-gradient(135deg, #2d3033 0%, #1f2225 100%); color: #fff; padding: 70px 20px; text-align: center; }
+    .article-header h1 { color: #fff; font-size: 34px; max-width: 820px; margin: 0 auto 14px; }
+    .article-header .meta { color: #c9cccf; font-size: 14px; }
+    article.post-content { max-width: 820px; margin: 0 auto; padding: 60px 20px; }
+    article.post-content p { margin-bottom: 22px; overflow-wrap: break-word; }
+    article.post-content h2 { font-size: 26px; margin: 44px 0 18px; }
+    article.post-content h3 { font-size: 21px; margin: 36px 0 14px; }
+    article.post-content h5 { font-size: 16px; margin: 28px 0 12px; }
+    article.post-content ul, article.post-content ol { margin: 0 0 22px 24px; }
+    article.post-content li { margin-bottom: 8px; }
+    article.post-content blockquote {
+      margin: 0 0 22px; padding: 2px 0 2px 20px;
+      border-left: 3px solid var(--accent);
+      color: var(--heading); font-size: 16px;
+    }
+    article.post-content blockquote p:last-child { margin-bottom: 0; }
+    article.post-content figure { margin: 30px 0; text-align: center; }
+    article.post-content figure img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 6px; }
+    article.post-content pre {
+      background: #2d3033; color: #f2f2f2; padding: 20px; border-radius: 6px;
+      overflow-x: auto; margin: 0 0 22px; font-size: 13.5px; line-height: 1.55;
+    }
+    article.post-content pre code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
+    article.post-content code { font-family: "SFMono-Regular", Consolas, Menlo, monospace; }
+    .back-link { display: inline-block; margin-bottom: 30px; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+    .post-tags { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 14px; color: #999; }
+
+    /* Footer */
+    footer.site-footer { background: var(--dark); color: #aeb2b5; text-align: center; padding: 30px 20px; font-size: 13px; }
+    footer a { color: var(--accent); }
+    .social { display: flex; justify-content: center; align-items: center; gap: 12px; margin-bottom: 18px; }
+    .social a { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,.1); color: #fff; font-size: 16px; transition: background-color .25s ease-in-out; }
+    .social a:hover { background: var(--accent); color: #fff; }
+
+    @media (max-width: 768px) {
+      .header-inner { flex-direction: column; gap: 16px; }
+      .article-header h1 { font-size: 26px; }
+    }
+
+    /* Touch devices: 44px minimum tap targets (input method, not screen size) */
+    @media (pointer: coarse) {
+      nav a { display: inline-flex; align-items: center; min-height: 44px; }
+      .back-link { display: inline-flex; align-items: center; min-height: 44px; }
+    }
+  </style>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Diagnóstico de cámara Hikvision por RTSP",
+  "description": "Diagnóstico y troubleshooting RTSP de una cámara Hikvision: pérdida de paquetes por la fuente, error 401 Digest y video en vivo con ffplay forzando TCP.",
+  "image": "https://ajdelgados.com/assets/diagnostico-de-camara-hikvision-por-rtsp/og.png",
+  "datePublished": "2026-08-02",
+  "dateModified": "2026-08-02",
+  "inLanguage": "es",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://ajdelgados.com/blog/diagnostico-de-camara-hikvision-por-rtsp.html"
+  },
+  "author": {
+    "@type": "Person",
+    "name": "Arturo J. Delgado S.",
+    "url": "https://ajdelgados.com"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Arturo J. Delgado S.",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://ajdelgados.com/assets/logo_60x60.png"
+    }
+  }
+}
+  </script>
+</head>
+<body>
+
+  <a class="skip-link" href="#main">Saltar al contenido</a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand">
+        <img class="logo" src="../assets/logo_60x60.png" alt="AJDELGADOS" width="56" height="56">
+        <div id="header-text">
+          <div id="site-title"><a href="../index.html">AJDELGADOS</a></div>
+          <p id="site-description">Arturo J. Delgado S.</p>
+        </div>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="../index.html#inicio">Inicio</a></li>
+          <li><a href="../index.html#blog">Blog</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+
+  <div class="article-header">
+    <div class="container">
+      <h1>Diagnóstico de cámara Hikvision por RTSP</h1>
+      <p class="meta">Publicado el 2 de agosto de 2026 &middot; por Arturo J. Delgado S.</p>
+    </div>
+  </div>
+
+  <article class="post-content">
+    <a class="back-link" href="../index.html#blog">&larr; Volver al blog</a>
+
+<p>Tenía una cámara Hikvision DS-2CD1121G0-I funcionando perfectamente desde la app del celular, pero no lograba acceder a ella por RTSP. Lo que parecía un solo problema resultaron ser cuatro problemas superpuestos, y el más difícil de encontrar no tenía nada que ver con redes ni con software: era la fuente de alimentación &#8212; una que tuve que poner yo, porque <strong>la cámara no venía con fuente ni con cable de red</strong>.</p>
+
+<p>Este es el hilo completo del diagnóstico, con los comandos que usé en cada paso y lo que me enseñó cada hallazgo.</p>
+
+<h2>¿Qué es RTSP?</h2>
+
+<p>RTSP (<em>Real Time Streaming Protocol</em>) está definido en el <a href="https://www.rfc-editor.org/rfc/rfc2326" target="_blank" rel="noreferrer noopener">RFC 2326</a> desde 1998 y escucha por defecto en el <strong>puerto 554</strong>. Es el protocolo estándar con el que prácticamente cualquier cámara IP expone su video en la red local.</p>
+
+<p>Lo más importante para entenderlo, y lo que explica varios de los problemas de este post:</p>
+
+<blockquote><p>RTSP no transporta el video. Es un protocolo de <strong>control</strong>: el mando a distancia del stream, no el stream.</p></blockquote>
+
+<p>RTSP negocia <em>qué</em> hay disponible y <em>cómo</em> debe enviarse. Los datos de video viajan aparte, normalmente por RTP. Esa separación entre control y transporte es justamente donde fallaba VLC.</p>
+
+<h3>RTSP se parece muchísimo a HTTP</h3>
+
+<p>RTSP es texto plano, con métodos y códigos de estado, casi como HTTP. Sus métodos principales son:</p>
+
+<ul>
+<li><code>OPTIONS</code> &#8212; qué métodos soporta el servidor (útil como &#8220;ping&#8221; de RTSP).</li>
+<li><code>DESCRIBE</code> &#8212; describe el stream: codecs, resolución, pistas. Responde en formato SDP.</li>
+<li><code>SETUP</code> &#8212; acuerda el transporte (UDP o TCP) y abre una sesión.</li>
+<li><code>PLAY</code> / <code>PAUSE</code> &#8212; arranca y pausa el envío.</li>
+<li><code>TEARDOWN</code> &#8212; cierra la sesión y libera recursos.</li>
+</ul>
+
+<p>Un intercambio real se ve así:</p>
+
+<pre><code>OPTIONS rtsp://192.168.1.100:554/Streaming/Channels/101 RTSP/1.0
+CSeq: 1
+
+RTSP/1.0 200 OK
+CSeq: 1
+Public: DESCRIBE, SETUP, TEARDOWN, PLAY, PAUSE, GET_PARAMETER</code></pre>
+
+<p>Como usa los mismos códigos de estado que HTTP, un <code>401 Unauthorized</code> significa exactamente lo mismo: las credenciales no sirven. Por eso pude diagnosticar la autenticación con sockets de Python, sin ningún reproductor de video de por medio.</p>
+
+<p>A diferencia de HTTP, RTSP <strong>mantiene estado</strong>: tras el <code>SETUP</code> hay un <code>Session</code> que persiste entre peticiones. Eso lo hace más sensible a un enlace de red inestable.</p>
+
+<h3>El video viaja por RTP: UDP o TCP</h3>
+
+<p>Tras el <code>SETUP</code>, los paquetes de video se envían por RTP, y hay dos formas de hacerlo:</p>
+
+<ul>
+<li><strong>RTP sobre UDP</strong> (lo predeterminado) &#8212; menor latencia y tolera perder algún fotograma, pero le afecta la pérdida de paquetes y suele bloquearse en NAT y firewalls.</li>
+<li><strong>RTP interleaved sobre TCP</strong> &#8212; el video se multiplexa dentro de la misma conexión TCP del control. Más robusto y atraviesa NAT sin problema, a cambio de algo más de latencia.</li>
+</ul>
+
+<p>Esta elección es la que decide si ves imagen o una pantalla negra: VLC intentaba UDP por defecto y fallaba en silencio, mientras que <code>ffplay -rtsp_transport tcp</code> funcionó de inmediato.</p>
+
+<h3>Por qué vale la pena usar RTSP</h3>
+
+<p>La app del fabricante ya mostraba el video, así que la pregunta es legítima. RTSP aporta:</p>
+
+<ul>
+<li><strong>Acceso local y directo</strong>, sin pasar por la nube del fabricante.</li>
+<li><strong>Interoperabilidad</strong>: FFmpeg, VLC, <a href="https://www.home-assistant.io/" target="_blank" rel="noreferrer noopener">Home Assistant</a>, <a href="https://frigate.video/" target="_blank" rel="noreferrer noopener">Frigate</a> o cualquier NVR lo entienden.</li>
+<li><strong>Independencia del proveedor</strong>: la app usa el SDK privado de Hikvision en el puerto 8000, un protocolo cerrado que solo habla con sus propias herramientas.</li>
+</ul>
+
+<h2>El escenario: una Hikvision inaccesible por RTSP</h2>
+
+<ul>
+<li><strong>Cámara:</strong> Hikvision DS-2CD1121G0-I (gama económica, serie &#8220;1-series&#8221;), firmware compilado el 2024-07-29.</li>
+<li><strong>IP de la cámara:</strong> 192.168.1.100</li>
+<li><strong>Equipo de diagnóstico:</strong> macOS (Darwin 25.6.0), conectado por Ethernet al mismo router.</li>
+<li><strong>Accesorios:</strong> la cámara <strong>no venía con fuente de alimentación ni cable de red</strong>. Ambos los puse yo de lo que tenía en casa &#8212; un detalle que resultó ser el origen del problema más difícil del diagnóstico.</li>
+<li><strong>Síntoma:</strong> no se podía entrar por RTSP. La cámara sí funcionaba desde Hik-Connect / Guarding Vision, pero al abrir &#8220;Remote Configuration&#8221; en la app daba <em>Connection failed</em>.</li>
+</ul>
+
+<p>La DS-2CD1121G0-I se vende sin adaptador de corriente ni cable Ethernet, y la caja no lo advierte de forma evidente. Da por hecho una instalación con PoE o que ya tienes los accesorios correctos. Si no es tu caso, terminas improvisando &#8212; y es fácil agarrar la primera fuente con el conector adecuado sin revisar el voltaje.</p>
+
+<p>Las herramientas del diagnóstico fueron <code>ping</code>, <code>traceroute</code>, <code>nc</code>, <code>arp</code>, <code>curl --digest</code>, sondeos RTSP manuales con sockets de Python, y finalmente <code>ffprobe</code> / <code>ffplay</code> de FFmpeg.</p>
+
+<h2>Las cuatro causas del fallo RTSP (spoiler)</h2>
+
+<p>Adelanto el resumen, porque el valor de este post está en cómo se separaron:</p>
+
+<ol>
+<li><strong>Enlace de red inestable</strong> (20-40&#37; de pérdida de paquetes) &#8594; causado por una <strong>fuente de alimentación insuficiente</strong> (9V en vez de 12V).</li>
+<li><strong>Error 401 Unauthorized</strong> en RTSP y HTTP &#8594; contraseña incorrecta / no recordada.</li>
+<li><strong>Duda sobre el codec H.265 vs H.264</strong> &#8594; falsa alarma, ambos streams ya estaban en H.264.</li>
+<li><strong>VLC no mostraba el video</strong> &#8594; VLC usa UDP por defecto y fallaba en silencio.</li>
+</ol>
+
+<h2>Paso 1: verificar la red y el puerto 554 de RTSP</h2>
+
+<p>Lo primero es descartar lo obvio: ¿responde la cámara y están abiertos los puertos que necesito?</p>
+
+<pre><code>$ ping -c 3 192.168.1.100
+$ nc -z -w 3 -v 192.168.1.100 554   # RTSP
+$ nc -z -w 3 -v 192.168.1.100 80    # HTTP
+$ nc -z -w 3 -v 192.168.1.100 8000  # SDK privado Hikvision</code></pre>
+
+<p>Los tres puertos estaban abiertos, así que quedaron descartados el firewall, un RTSP deshabilitado y una cámara apagada. Pero el ping vino con <strong>33&#37; de pérdida de paquetes</strong>, y esa fue la primera alerta. En una LAN cableada la pérdida debe ser 0&#37;.</p>
+<h2>Paso 2: sondeo RTSP manual (OPTIONS y DESCRIBE)</h2>
+
+<p>Como RTSP es texto plano, no hace falta un reproductor para interrogar a la cámara: se puede hablar el protocolo a mano con sockets de Python y ver exactamente qué responde. Un <code>OPTIONS</code> devolvió <code>200 OK</code> con la lista de métodos (<code>DESCRIBE</code>, <code>SETUP</code>, <code>PLAY</code>&#8230;), lo que confirmaba que el servidor RTSP estaba vivo. Pero el <code>DESCRIBE</code> &#8212; el que pide la descripción del stream &#8212; devolvía <code>401 Unauthorized</code> en <strong>todas</strong> las rutas que probé.</p>
+
+<p>La cámara solo ofrecía autenticación <strong>Digest</strong>, con el realm <code>IP Camera(GC487)</code>.</p>
+
+<p>Aquí vino el hallazgo que me ahorró horas de perseguir la URL equivocada:</p>
+
+<blockquote><p>Hikvision valida las credenciales <strong>antes</strong> que la ruta. El 401 aparece igual sin importar si la URL del stream es correcta o no.</p></blockquote>
+
+<p>Es decir: mientras la autenticación falle, probar veinte variantes de URL RTSP no aporta información. El problema no era la ruta, era la contraseña.</p>
+
+<h2>Paso 3: descartar un bloqueo por IP</h2>
+
+<p>Hikvision bloquea la IP origen después de varios intentos fallidos, así que había que confirmar que no estaba en esa situación. Dos señales lo descartaron: la cámara generaba un <em>nonce</em> nuevo en cada intento, y la página de login seguía cargando con <code>200</code>.</p>
+
+<p>Con eso confirmado, un <code>curl --digest</code> con la contraseña que creía correcta seguía dando 401. La cámara se había configurado únicamente desde la app móvil, y la contraseña local de admin no era la que yo recordaba.</p>
+
+<h2>Paso 4: por qué fallaba &#8220;Remote Configuration&#8221;</h2>
+
+<p>El <em>Connection failed</em> de la app parecía un problema aparte, pero encajaba con la pérdida de paquetes. El puerto 8000 usa un protocolo privado de Hikvision con un <strong>handshake sostenido</strong>, a diferencia de HTTP y RTSP que son peticiones cortas.</p>
+
+<p>Con 20&#37; de pérdida, una petición corta a veces pasa; un handshake sostenido se rompe a la mitad casi siempre. Mismo problema de fondo, síntoma distinto.</p>
+
+<h2>Paso 5: caracterizar la pérdida de paquetes</h2>
+
+<p>Este es el paso que apuntó a la causa raíz. En vez de solo medir <em>cuánta</em> pérdida había, medí cómo cambiaba según el tamaño del paquete:</p>
+
+<pre><code>$ ping -c 30 -s 56   192.168.1.100   # paquete pequeño -> 10% de pérdida
+$ ping -c 30 -s 1472 192.168.1.100   # paquete grande (MTU llena) -> 43% de pérdida</code></pre>
+
+<p>La pérdida <strong>escala con el tamaño del paquete</strong>. Esa es la firma clásica de un problema físico de capa 1 (cable, conector, interferencia electromagnética) o de <strong>alimentación insuficiente</strong>, no de un problema de configuración o de software.</p>
+
+<p>También revisé la tabla ARP para descartar una IP duplicada: una sola MAC asociada, todo limpio.</p>
+
+<pre><code>$ arp -a | grep 192.168.1.100</code></pre>
+
+<h2>Paso 6: aislar el origen de la pérdida</h2>
+
+<p>Para saber si el problema era la red común o el tramo de la cámara, hice la misma prueba de paquete grande contra el router:</p>
+
+<pre><code>$ ping -c 30 -s 1472 192.168.1.1     # router -> 0% de pérdida
+$ ping -c 30 -s 1472 192.168.1.100   # cámara -> 37% de pérdida</code></pre>
+
+<p>Mismo camino de red, mismo tamaño de paquete, resultados opuestos. El router y mi enlace Ethernet estaban sanos; el problema estaba aislado en la cámara.</p>
+
+<h2>Paso 7: descartes físicos</h2>
+
+<p>Antes de mirar la fuente, descarté lo físico evidente:</p>
+
+<ul>
+<li>Probé <strong>3 cables distintos</strong> &#8594; todos con ~20&#37; de pérdida.</li>
+<li>Probé <strong>puertos diferentes del router</strong> &#8594; sin cambios.</li>
+<li>La cámara está conectada al <strong>mismo router</strong> que el equipo, sin switch intermedio.</li>
+<li>No usa PoE: se alimenta con una fuente de energía aparte, que tampoco venía incluida.</li>
+</ul>
+
+<p>Los 3 cables fueron el primer sospechoso justamente porque ninguno era el original &#8212; la cámara no trajo cable de red. Pero fallar igual con los tres es lo que descartó el cable como causa y dejó a la alimentación como único sospechoso improvisado que quedaba.</p>
+
+<p>Y un patrón muy revelador: el enlace <strong>arrancaba limpio y se degradaba bajo tráfico sostenido</strong>. Un cable defectuoso falla de forma más constante; algo que empeora con la carga apunta a energía.</p>
+<h2>Paso 8: la causa raíz del fallo RTSP</h2>
+
+<p>Revisé la etiqueta de la fuente de alimentación: decía <strong>9V</strong>. La DS-2CD1121G0-I requiere <strong>12V DC</strong> (o PoE).</p>
+
+<p>Aquí cerró el círculo con el detalle del escenario: como la cámara no trajo fuente, usé una que tenía a mano porque el conector encajaba. Y el conector encajaba perfectamente &#8212; el barrel jack de 5.5&#215;2.1&nbsp;mm es el mismo para 5V, 9V y 12V. Nada impide físicamente conectar la fuente equivocada, y la cámara <em>enciende</em>, así que no hay ninguna señal de que algo esté mal.</p>
+
+<p>La cámara estaba <strong>subvoltada</strong>. Arrancaba y respondía peticiones pequeñas, pero no tenía margen para sostener el chip de red bajo carga. Eso explicaba los tres síntomas de red a la vez:</p>
+
+<ul>
+<li>Pérdida que crece con el paquete grande.</li>
+<li>Pérdida que aparece bajo tráfico sostenido.</li>
+<li><em>Connection failed</em> en la configuración remota, que necesita una sesión sostenida.</li>
+</ul>
+
+<h2>Paso 9: red estable y RTSP respondiendo 200 OK</h2>
+
+<p>Cambié a otra fuente (también etiquetada 9V, pero con suficiente amperaje y mejor voltaje real bajo carga) y verifiqué:</p>
+
+<pre><code>$ ping -c 40 -s 1472 192.168.1.100
+# 40 paquetes transmitidos, 40 recibidos, 0.0% de pérdida</code></pre>
+
+<p>0&#37; de pérdida con paquete grande, y el <code>OPTIONS</code> de RTSP respondiendo <code>200 OK</code>. Problema de red resuelto.</p>
+
+<p>La fuente sigue siendo de 9V y la cámara pide 12V. Funciona, pero está al límite. Lo correcto es una fuente de <strong>12V DC, 1A o más, centro-positivo</strong>, sobre todo para la noche cuando se enciende el IR y sube el consumo.</p>
+
+<h2>Resolver el 401 Unauthorized de RTSP: las credenciales</h2>
+
+<p>Con la red estable, quedaba la autenticación. Terminé entrando por HTTP a <code>http://192.168.1.100</code> con la contraseña correcta.</p>
+
+<p>Un detalle que vale la pena documentar: la contraseña contenía números, letras y un guion. El guion no da problemas en una URL, pero otros caracteres sí rompen la URL RTSP y hay que codificarlos:</p>
+
+<pre><code>@  ->  %40        :  ->  %3A        /  ->  %2F
+#  ->  %23        ?  ->  %3F        &amp;  ->  %26
+%  ->  %25        +  ->  %2B        espacio -> %20</code></pre>
+
+<p>Para evitar el problema de raíz, es mejor usar campos separados de usuario y contraseña cuando la herramienta lo permita, o comillas simples en el shell.</p>
+
+<p>Para verificar credenciales rápido, sin video de por medio, ISAPI es ideal:</p>
+
+<pre><code>$ curl -s -o /dev/null -w '%{http_code}\n' --digest -u admin:'TU_PASSWORD' \
+    http://192.168.1.100/ISAPI/System/deviceInfo
+# 200 = credenciales correctas, 401 = incorrectas</code></pre>
+
+<h2>El codec del stream RTSP: H.265 vs H.264</h2>
+
+<p>Sospechaba que la cámara estuviera emitiendo H.265, que muchos clientes no reproducen bien. Lo consulté por ISAPI en lugar de adivinar desde la interfaz web:</p>
+
+<pre><code>$ curl --digest -u admin:'TU_PASSWORD' \
+    http://192.168.1.100/ISAPI/Streaming/channels/101 | grep videoCodecType
+$ curl --digest -u admin:'TU_PASSWORD' \
+    http://192.168.1.100/ISAPI/Streaming/channels/102 | grep videoCodecType</code></pre>
+
+<p>Ambos respondieron <code>&lt;videoCodecType&gt;H.264&lt;/videoCodecType&gt;</code>: el stream principal (101) y el sub-stream (102) ya estaban en H.264. No hubo nada que cambiar.</p>
+
+<p>Si hubiera hecho falta cambiarlo: <em>Web &#8594; Configuración &#8594; Vídeo/Audio &#8594; Vídeo &#8594; Tipo de flujo &#8594; Codificación de vídeo &#8594; H.264 &#8594; Guardar</em>, repitiendo por cada stream y desactivando también &#8220;H.265+&#8221; o &#8220;Smart Codec&#8221; si aparecen.</p>
+
+<h2>Reproducir el RTSP: el problema de VLC con UDP</h2>
+
+<p>Con la red estable, las credenciales correctas y H.264 confirmado, VLC seguía sin mostrar el video &#8212; y sin pedir usuario ni contraseña, lo cual era la pista.</p>
+
+<p>La causa es la separación entre control y transporte que expliqué al principio: <strong>VLC usa RTP sobre UDP por defecto</strong>. La parte de control (RTSP) negociaba bien, pero los paquetes de video por UDP no llegaban, y VLC no reportaba nada. Que ni siquiera pidiera credenciales era la pista: nunca completó la negociación.</p>
+
+<p>En VLC se arregla en <em>Preferencias &#8594; Mostrar Todos &#8594; Entrada/Códecs &#8594; Demultiplexores &#8594; RTP/RTSP &#8594; &#8220;Usar RTP sobre RTSP (TCP)&#8221;</em>.</p>
+
+<p>En vez de pelear con la GUI, instalé FFmpeg para diagnosticar mejor:</p>
+
+<pre><code>$ brew install ffmpeg</code></pre>
+
+<p>Y <code>ffprobe</code> conectó de inmediato forzando TCP:</p>
+
+<pre><code>$ ffprobe -rtsp_transport tcp \
+    "rtsp://admin:TU_PASSWORD@192.168.1.100:554/Streaming/Channels/101"
+
+Stream #0:0: Video: h264 (Main), yuvj420p, 1920x1080, 25 fps</code></pre>
+
+<p>La solución final para ver el video en vivo fue <code>ffplay</code>, que viene con FFmpeg:</p>
+
+<pre><code>$ ffplay -rtsp_transport tcp \
+    "rtsp://admin:TU_PASSWORD@192.168.1.100:554/Streaming/Channels/101"</code></pre>
+
+<p>Video en vivo confirmado a 1920x1080, 25 fps. Problema resuelto.</p>
+
+<h2>Comandos RTSP de referencia rápida</h2>
+
+<pre><code># Ver el stream principal (1080p)
+ffplay -rtsp_transport tcp "rtsp://admin:PASS@192.168.1.100:554/Streaming/Channels/101"
+
+# Ver el sub-stream (más ligero)
+ffplay -rtsp_transport tcp "rtsp://admin:PASS@192.168.1.100:554/Streaming/Channels/102"
+
+# Verificar credenciales (200 = OK, 401 = mal)
+curl -s -o /dev/null -w '%{http_code}\n' --digest -u admin:'PASS' \
+  http://192.168.1.100/ISAPI/System/deviceInfo
+
+# Probar estabilidad real de la red (0% = bien)
+ping -c 30 -s 1472 192.168.1.100</code></pre>
+
+<p>Sobre las URLs RTSP de Hikvision:</p>
+
+<pre><code># Formato moderno
+rtsp://IP:554/Streaming/Channels/101   # canal 1, stream principal
+rtsp://IP:554/Streaming/Channels/102   # canal 1, sub-stream
+
+# Formato antiguo (firmware viejo)
+rtsp://IP:554/h264/ch1/main/av_stream</code></pre>
+
+<h2>Conclusión: lecciones del diagnóstico RTSP</h2>
+
+<p>Lo que más me sirvió de este diagnóstico:</p>
+
+<ul>
+<li><strong>Medir cómo cambia el síntoma, no solo si existe.</strong> Saber que había 20&#37; de pérdida no decía nada; saber que la pérdida <em>escalaba con el tamaño del paquete</em> apuntó directo a un problema físico o de energía.</li>
+<li><strong>Comparar contra un control.</strong> El ping al router por el mismo camino fue lo que aisló el problema a la cámara.</li>
+<li><strong>Entender el orden de validación.</strong> Como Hikvision valida credenciales antes que la ruta, insistir con variantes de URL era perder el tiempo.</li>
+<li><strong>Un fallo silencioso también es información.</strong> Que VLC no pidiera credenciales indicaba que nunca llegó a negociar; el problema era el transporte UDP, no el video.</li>
+<li><strong>No todo es software.</strong> La causa raíz del problema más grande era una fuente de 9V donde hacían falta 12V.</li>
+<li><strong>Sospecha de lo que no vino en la caja.</strong> La cámara no incluía fuente ni cable de red, así que los dos únicos componentes improvisados del montaje eran precisamente los candidatos más probables. Cuando algo no es el accesorio original, súbelo en la lista de sospechosos desde el principio &#8212; y verifica el voltaje contra la especificación antes de descartar la alimentación.</li>
+</ul>
+
+<p>Si vas a comprar esta cámara o una parecida, revisa qué trae la caja: si no incluye adaptador, consigue uno de <strong>12V DC, 1A o más, centro-positivo</strong>, o resuélvelo con PoE y un inyector. Es más barato que perder una tarde persiguiendo un fantasma en la red.</p>
+
+<p>Un par de notas de seguridad que dejé pendientes: la contraseña quedó en el historial de zsh al aparecer dentro de las URLs de <code>ffprobe</code> y <code>ffplay</code>, así que conviene limpiar el historial y cambiar la contraseña desde la web.</p>
+
+<p>Con el stream RTSP en H.264 ya estable, el siguiente paso natural es integrarlo con Home Assistant o Frigate para grabación y detección de movimiento.</p>
+    <p class="post-tags"><strong>Etiquetado en:</strong> Hikvision &middot; RTSP &middot; FFmpeg &middot; Redes &middot; Cámaras IP &middot; Troubleshooting</p>
+    <p><a class="back-link" href="../index.html#blog">&larr; Volver al blog</a></p>
+
+  </article>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="social">
+        <a href="https://www.linkedin.com/in/ajdelgados" title="LinkedIn" aria-label="LinkedIn"><i class="fa fa-linkedin"></i></a>
+        <a href="https://www.facebook.com/ajdelgados" title="Facebook" aria-label="Facebook"><i class="fa fa-facebook"></i></a>
+        <a href="https://www.twitter.com/ajdelgados" title="Twitter" aria-label="Twitter"><i class="fa fa-twitter"></i></a>
+      </div>
+      Copyright &copy; 2026 AJDELGADOS. Todos los derechos reservados.
+    </div>
+  </footer>
+
+</body>
+</html>

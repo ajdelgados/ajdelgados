@@ -9,7 +9,7 @@ organizations and people build efficient information systems.
 
 #### 🌐 Visit my website 👉 [ajdelgados.com](https://ajdelgados.com)
 
-Read my blog about AWS, React, NestJS, Golang, GraphQL and more.
+Read my blog about AWS, React, NestJS, Golang, GraphQL, networking and more.
 
 #### 📫 Find me on
 

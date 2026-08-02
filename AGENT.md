@@ -9,7 +9,7 @@ HTML with no framework and no build step.
 
 ```
 ajdelgados/
-├── index.html                 # Home page (hero, "Sobre mí", blog list)
+├── index.html                 # Home page (hero, "Sobre mí", 4 latest posts)
 ├── blog/
 │   └── <slug>.html            # One file per article
 └── assets/
@@ -51,6 +51,8 @@ All values live in each page's inline `<style>`
 
 Other conventions:
 - Font: `"Helvetica Neue", Helvetica, Arial, sans-serif`, `font-size: 15px`, `line-height: 1.7`.
+- `<blockquote>` inside `article.post-content` gets a 3px `--accent` left border and
+  `--heading` text — use it to pull out a key takeaway, not for long quoted passages.
 - Language: **Spanish** (`<html lang="es">`), all content in Spanish.
 - **Font Awesome 4.7.0** via cdnjs for icons (features and social media).
   Icons used in features: `fa-bolt` (Ágil), `fa-microchip` (Innovador), `fa-cubes` (Lógico).
@@ -78,6 +80,38 @@ right after `<meta charset="UTF-8">`, as high as possible in `<head>`:
 ```
 
 ## SEO
+
+### On-page budget — the two limits that get missed
+
+These are the two findings that keep coming back in SEO audits of this site. Check them
+**while writing** the post, not after:
+
+| Check | Limit | Why |
+|---|---|---|
+| **`<meta name="description">` length** | **≤ 158 characters** (aim 145–155) | Google cuts the snippet around 155–160 chars. Past that the sentence is truncated mid-word and the value proposition is lost. |
+| **Keyword coverage in `<h2>`** | **≥ 50% of the `<h2>`s** name the target keyword | Headings are the strongest on-page structural signal after the `<h1>`. A post with 2 of 17 `<h2>`s mentioning the keyword reads as off-topic to a crawler. |
+
+**Never fake the coverage.** A heading only gets the keyword if that section genuinely talks
+about it — `Paso 7: descartes físicos RTSP` is a lie when the section is about cables and
+voltage, and Google reads it as keyword stuffing. Truthful headings on ~70% of sections beat
+100% with false labels. Sections that legitimately cover something else stay as they are;
+that's a correct result, not a miss.
+
+Rewriting a heading for coverage is also a chance to make it **long-tail searchable** — phrase
+it the way someone types the query (`Resolver el 401 Unauthorized de RTSP` over `Resolver el
+401`), so it stands on its own in a featured snippet or a shared table of contents.
+
+Other on-page rules: the keyword belongs in the `<title>`, the `<h1>`, the first paragraph, and
+at least one `<h2>` in the first third of the article. The description must be **identical**
+across all four places it appears (`meta description`, `og:description`, `twitter:description`,
+and the JSON-LD `description`) — see step 13 for how to verify that.
+
+`llms.txt` is **exempt** from the 158-char limit: it's a map for LLMs, not a search snippet, so
+a longer and more detailed summary there is correct. The `index.html` card is also exempt — it's
+home-page copy meant to pull in a reader already on the site, with a different job than a SERP
+snippet. Both should stay *coherent* with the description, not identical to it.
+
+### Site-wide files and per-page tags
 
 Every page carries a full SEO layer. Site-wide files at the root: **`sitemap.xml`**
 (lists every URL), **`robots.txt`** (allows all crawlers, points to the sitemap), and
@@ -164,9 +198,16 @@ The existing posts were migrated from WordPress. The process to migrate/create o
      (date taken from the original `datetime`, e.g. "28 de octubre de 2020")
    - `.post-tags` at the end → `<strong>Etiquetado en:</strong> Tag1 &middot; Tag2 …`
 
-7. **Link from `index.html`.** In the `#blog` section, update the matching
-   `<article class="post">`: both the `<h3><a>` and the `<a class="read-more">` must point
-   to `blog/<slug>.html` (replace the `href="#"` placeholders).
+7. **Link from `index.html`.** In the `#blog` section ("Lo último del Blog"), add a new
+   `<article class="post">` as the **first** card (newest first): an `<h3><a>` with the
+   title, a `<p>` summary, and an `<a class="read-more">`. Both links point to
+   `blog/<slug>.html`.
+
+   **The section shows exactly the 4 most recent posts** — when you add one, delete the
+   oldest card so the count stays at 4. The grid is `repeat(2, 1fr)`, so 4 keeps a full
+   2×2 with no orphan card in the last row. Dropping a post from the home page does **not**
+   unpublish it: its page, `sitemap.xml` entry, and `llms.txt` bullet all stay (those lists
+   are complete, not "latest"), so it remains indexable and reachable by URL.
 
 8. **Add the SEO layer** to the new page (see the SEO section above): canonical, author,
    keywords, robots, full Open Graph + Twitter Card meta, and a `BlogPosting` JSON-LD block.
@@ -189,13 +230,49 @@ The existing posts were migrated from WordPress. The process to migrate/create o
     in the *"Read my blog about …"* line. If the new article introduces a technology/topic
     not yet listed, add it to keep the list current.
 
-13. **Verify** before finishing:
+13. **Run the SEO evaluation.** Pick the post's **target keyword** (usually the main technology
+    or protocol — `RTSP`, `AWS Secrets Manager`, `Mautic`) and check it against the on-page
+    budget in the SEO section above. Two commands, run from the repo root:
+
+    ```bash
+    # 1. Description length (<= 158) + same text in every place it appears.
+    #    Posts expect 4 copies (meta, og, twitter, JSON-LD BlogPosting).
+    #    index.html expects 3 — the WebSite schema has no description field.
+    python3 - <<'PY'
+    import re, glob, html
+    for f in sorted(glob.glob('blog/*.html')) + ['index.html']:
+        s = open(f).read()
+        d = re.search(r'<meta name="description" content="(.*?)">', s)
+        if not d: continue
+        desc = d.group(1)
+        n = len(html.unescape(desc))
+        # compare unescaped: og:/twitter: escape a literal & as &amp;
+        copies = html.unescape(s).count(html.unescape(desc))
+        want = 3 if f == 'index.html' else 4
+        print(f"{n:4d} {'OK ' if n <= 158 else 'LONG'}  copies={copies}/{want} "
+              f"{'OK' if copies == want else 'MISMATCH'}  {f}")
+    PY
+
+    # 2. Keyword coverage in H2 — must be >= 50%
+    f=blog/<slug>.html; kw='RTSP'
+    echo "$(grep -c "<h2>[^<]*$kw" $f) of $(grep -c '<h2>' $f) H2 mention '$kw'"
+    ```
+
+    If coverage is under half, rewrite the headings where the keyword is **genuinely**
+    descriptive of that section — and leave the rest alone (see the "Never fake the coverage"
+    rule above). Report the final ratio and say explicitly which sections were left without the
+    keyword and why.
+
+14. **Verify** before finishing:
     - Every path (`../assets/…`, `../index.html`, the `og.png`) resolves to existing files.
     - `<article>` opens and closes exactly once; exactly one rendered `<h1>`.
     - Zero unescaped tags inside code blocks.
     - The Google Analytics tag is present.
     - Canonical + OG + Twitter + JSON-LD present; JSON-LD parses as valid JSON.
+    - **`<meta name="description">` is ≤ 158 chars and identical in all 4 locations.**
+    - **At least half the `<h2>`s name the target keyword** (truthfully).
     - The post is listed in both `sitemap.xml` and `llms.txt`.
+    - `index.html` has exactly 4 `<article class="post">` cards, newest first.
 
 ## Post page structure
 

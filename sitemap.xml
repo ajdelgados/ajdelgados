@@ -6,6 +6,12 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://ajdelgados.com/blog/diagnostico-de-camara-hikvision-por-rtsp.html</loc>
+    <lastmod>2026-08-02</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://ajdelgados.com/blog/react-con-aws-cognito-para-autenticacion-de-usuario.html</loc>
     <lastmod>2020-10-28</lastmod>
     <changefreq>yearly</changefreq>

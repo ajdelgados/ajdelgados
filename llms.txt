@@ -1,10 +1,11 @@
 # AJDELGADOS — Arturo J. Delgado S.
 
 > Software Developer & Software Architect. Blog sobre AWS, React, NestJS,
-> Golang, GraphQL y arquitectura de software. Contenido en español.
+> Golang, GraphQL, redes y arquitectura de software. Contenido en español.
 
 ## Blog
 
+- [Diagnóstico de cámara Hikvision por RTSP](https://ajdelgados.com/blog/diagnostico-de-camara-hikvision-por-rtsp.html): Diagnóstico de acceso RTSP a una cámara Hikvision: pérdida de paquetes causada por una fuente de alimentación insuficiente, error 401 con autenticación Digest, verificación del codec H.264 por ISAPI y reproducción con ffplay forzando TCP.
 - [React con AWS Cognito para autenticación de usuario](https://ajdelgados.com/blog/react-con-aws-cognito-para-autenticacion-de-usuario.html): Autenticación de usuario con AWS Cognito y un frontend hecho con React JS usando directamente el API de Cognito.
 - [Mautic en AWS instalación con Nginx](https://ajdelgados.com/blog/mautic-en-aws-instalacion-con-nginx.html): Instalación y configuración de Mautic sobre AWS con Nginx, PHP, MySQL y Composer.
 - [NestJS con AWS Secrets Manager](https://ajdelgados.com/blog/nestjs-con-aws-secrets-manager.html): Consumir AWS Secrets Manager desde una aplicación NestJS usando el AWS SDK para manejar credenciales de forma segura.
