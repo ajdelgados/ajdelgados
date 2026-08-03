@@ -1,7 +1,31 @@
 # AJDELGADOS — Arturo J. Delgado S.
 
-> Software Developer & Software Architect. Blog sobre AWS, React, NestJS,
+> Software Architect con 14 certificaciones AWS —incluidas Solutions Architect,
+> DevOps Engineer y Generative AI Developer a nivel Professional— y Claude
+> Certified Architect – Foundations de Anthropic. Blog sobre AWS, React, NestJS,
 > Golang, GraphQL, redes y arquitectura de software. Contenido en español.
+
+## Certificaciones
+
+Credenciales verificables en Credly, mostradas en la sección
+[Certificaciones](https://ajdelgados.com/#badges) de la portada.
+14 certificaciones AWS en total; las de mayor nivel:
+
+- AWS Certified Solutions Architect – Professional
+- AWS Certified DevOps Engineer – Professional
+- AWS Certified Generative AI Developer – Professional
+- AWS Certified Security – Specialty
+- AWS Certified Advanced Networking – Specialty
+- AWS Certified Machine Learning – Specialty
+- AWS Certified Machine Learning Engineer – Associate
+
+Machine learning e IA generativa:
+
+- Claude Certified Architect – Foundations (Anthropic) — diseño y construcción de
+  aplicaciones en producción con Claude Code, el Claude Agent SDK, la Claude API y MCP.
+- AWS Certified Generative AI Developer – Professional
+- AWS Certified Machine Learning – Specialty
+- AWS Certified Machine Learning Engineer – Associate
 
 ## Blog
 
