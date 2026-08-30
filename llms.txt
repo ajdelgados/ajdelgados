@@ -29,6 +29,7 @@ Machine learning e IA generativa:
 
 ## Blog
 
+- [¿Demasiado cauteloso o la IA no debería tener las llaves de producción?](https://ajdelgados.com/blog/demasiado-cauteloso-con-la-ia-en-produccion.html): Reflexión personal sobre el uso de IA en entornos de producción críticos: por qué leo línea por línea el código que genera Claude Code o Copilot, cómo uso la IA para entender y revisar PR sin delegarle la aprobación, el riesgo de darle a un agente permisos de ejecución en producción, y por qué acumular plugins no sustituye al criterio técnico.
 - [Diagnóstico de cámara Hikvision por RTSP](https://ajdelgados.com/blog/diagnostico-de-camara-hikvision-por-rtsp.html): Diagnóstico de acceso RTSP a una cámara Hikvision: pérdida de paquetes causada por una fuente de alimentación insuficiente, error 401 con autenticación Digest, verificación del codec H.264 por ISAPI y reproducción con ffplay forzando TCP.
 - [React con AWS Cognito para autenticación de usuario](https://ajdelgados.com/blog/react-con-aws-cognito-para-autenticacion-de-usuario.html): Autenticación de usuario con AWS Cognito y un frontend hecho con React JS usando directamente el API de Cognito.
 - [Mautic en AWS instalación con Nginx](https://ajdelgados.com/blog/mautic-en-aws-instalacion-con-nginx.html): Instalación y configuración de Mautic sobre AWS con Nginx, PHP, MySQL y Composer.
