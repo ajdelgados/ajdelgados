@@ -37,7 +37,6 @@
   <link rel="icon" href="assets/favicon-192x192.png" sizes="192x192">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <link rel="stylesheet" href="https://use.typekit.net/kmj5qkr.css">
   <style>
     :root {
       --accent: #80abc8;
@@ -133,7 +132,7 @@
 
     /* Badges (Credly) */
     #badges { border-top: 1px solid var(--border); }
-    /* Los 8 badges de Credly son iframes: su texto no es indexable ni lo lee
+    /* Los badges de Credly son iframes: su texto no es indexable ni lo lee
        un screen reader. Esta lista da el equivalente accesible/rastreable. */
     .sr-only {
       position: absolute; width: 1px; height: 1px; overflow: hidden;
@@ -145,62 +144,7 @@
     }
     /* Reserve the embed's 150x270 box so the async iframes don't shift the layout */
     .badge { width: 150px; min-height: 270px; }
-
-    /* Toptal badge — hexágono propio, no es un embed de Credly.
-       El marco replica el CSS del iframe de Credly para que la celda se vea
-       igual a las otras 8: borde #e5e5e5 radio 3px + barra inferior #f0f0f0. */
-    .tt-badge {
-      display: flex; flex-direction: column;
-      background: #fff; border: 1px solid #e5e5e5; border-radius: 3px;
-      /* el marco se ajusta a su contenido en vez de estirarse a los 270px
-         que los iframes de Credly necesitan reservar */
-      align-self: start; min-height: 0;
-    }
-    .tt-badge-body { display: flex; justify-content: center; padding: 22px 0 0; }
-    .tt-badge-inner {
-      --hex: polygon(50% 0, 100% 24%, 100% 76%, 50% 100%, 0 76%, 0 24%);
-      font-family: proxima-nova, "Helvetica Neue", Arial, sans-serif;
-      /* zoom (no transform) para que el tamaño reducido cuente en el layout
-         y flex pueda centrarlo sin márgenes negativos. */
-      zoom: .46;
-    }
-    /* mismos valores que #badge-name / #badge-issuer del embed de Credly */
-    .tt-name {
-      display: block; color: #333; font-size: 15px; font-weight: normal;
-      line-height: 1.1em; margin: 22px 8px 8px; text-align: center;
-    }
-    .tt-issuer {
-      color: #666; font-size: 12px; font-style: italic;
-      line-height: 1.1em; margin: 0 8px 18px; text-align: center;
-    }
-    .tt-name a { color: #333; }
-    .tt-name a:hover { color: var(--link-hover); }
-    .tt-provided {
-      background: #f0f0f0; border-top: 1px solid #e2e2e2;
-      border-radius: 0 0 3px 3px;
-      color: #b6b6b6; font-size: 7px; line-height: 28px;
-      text-transform: uppercase; text-align: center; letter-spacing: .5px;
-    }
-    .tt-frame { display: inline-block; background: #25a9ef; padding: 6px; clip-path: var(--hex); }
-    .tt-card {
-      width: 200px; padding: 24px 0 40px;
-      display: flex; flex-direction: column; align-items: center; gap: 8px;
-      color: #fff; text-align: center;
-      background: linear-gradient(153deg, #0667ff 18%, #204ecf 40%, #0f256e 80%);
-      clip-path: var(--hex); box-shadow: 0 28px 50px rgba(6,30,96,.35);
-    }
-    /* rótulo del gráfico, no un heading: es un span para no ensuciar el
-       outline de headings de la página (display:block reemplaza el del h3) */
-    .tt-title { display: block; margin: 0; font-size: 19px; font-weight: 700; line-height: 1; color: #fff; }
-    .tt-rule { width: 120px; height: 1px; background: #25a9ef; }
-    .tt-by { font-size: 16px; opacity: .8; margin-bottom: -6px; }
-    .tt-cta {
-      display: inline-flex; align-items: center; justify-content: center;
-      padding: 4px 20px; border-radius: 6px; background: #296bff;
-      color: #fff; font-size: 16px; font-weight: 500;
-      text-decoration: underline; text-decoration-thickness: .5px; text-underline-offset: 2px;
-    }
-    .tt-cta:hover { color: #fff; background: #1a56e0; }
+    .badges-more { margin-top: 30px; text-align: center; }
 
     /* Blog */
     .blog { background: var(--light); }
@@ -214,7 +158,30 @@
     .post h3 a { color: var(--heading); }
     .post h3 a:hover { color: var(--link-hover); }
     .post p { margin-bottom: 16px; }
+    /* Card footer: read-more on the left, date on the right, pinned to the bottom. */
+    .post { display: flex; flex-direction: column; }
+    .post[hidden] { display: none; } /* .post sets display, so the pager needs this rule */
+    .post .post-footer { margin-top: auto; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .post .post-date { font-size: 13px; color: #999; }
     .read-more { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+    /* Blog pager. Without JS every card stays visible and the pager stays hidden. */
+    .pager { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 30px; }
+    .pager[hidden] { display: none; }
+    .pager button {
+      min-width: 40px; min-height: 40px; padding: 0 12px;
+      border: 1px solid var(--border); border-radius: 4px; background: #fff;
+      color: var(--link); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+    }
+    .pager button:hover:not(:disabled) { border-color: var(--accent); color: var(--link-hover); }
+    .pager button[aria-current="page"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .pager button:disabled { opacity: .4; cursor: default; }
+    /* Small screens: only the first, previous, next, and last buttons. */
+    @media (max-width: 420px) {
+      .pager .page-num { display: none; }
+    }
+    @media (pointer: coarse) {
+      .pager button { min-width: 44px; min-height: 44px; }
+    }
 
     /* Social icons */
     .social { display: flex; justify-content: center; align-items: center; gap: 12px; margin-bottom: 18px; }
@@ -238,10 +205,14 @@
       .features, .posts { grid-template-columns: 1fr; }
       .hero h1 { font-size: 30px; }
       .badges-grid { grid-template-columns: repeat(2, 150px); gap: 24px; }
+      /* 2 columns: show 6 badges so no badge is left alone. Credly replaces each .badge div with an iframe, so select by position, not by class */
+      .badges-grid > :nth-child(n+7) { display: none; }
     }
 
     @media (max-width: 420px) {
       .badges-grid { grid-template-columns: 150px; }
+      /* 1 column: show the first 4 badges only */
+      .badges-grid > :nth-child(n+5) { display: none; }
     }
 
     /* Touch devices: 44px minimum tap targets (input method, not screen size) */
@@ -284,13 +255,6 @@
       },
       {
         "@type": "EducationalOccupationalCredential",
-        "name": "AWS Certified Solutions Architect - Professional",
-        "credentialCategory": "certification",
-        "url": "https://www.credly.com/badges/8902d4fc-3191-45e8-8014-0bf8af8eeef8",
-        "recognizedBy": { "@type": "Organization", "name": "Amazon Web Services" }
-      },
-      {
-        "@type": "EducationalOccupationalCredential",
         "name": "AWS Certified DevOps Engineer - Professional",
         "credentialCategory": "certification",
         "url": "https://www.credly.com/badges/6dfebd2c-2da3-413a-9fcb-7db323493552",
@@ -298,9 +262,16 @@
       },
       {
         "@type": "EducationalOccupationalCredential",
+        "name": "AWS Certified Solutions Architect - Professional",
+        "credentialCategory": "certification",
+        "url": "https://www.credly.com/badges/8902d4fc-3191-45e8-8014-0bf8af8eeef8",
+        "recognizedBy": { "@type": "Organization", "name": "Amazon Web Services" }
+      },
+      {
+        "@type": "EducationalOccupationalCredential",
         "name": "AWS Certified Security - Specialty",
         "credentialCategory": "certification",
-        "url": "https://www.credly.com/badges/35d16ca4-dcbe-4157-9798-607511eed3c8",
+        "url": "https://www.credly.com/badges/5beba307-9f22-4571-b6a5-811ed6ef601c",
         "recognizedBy": { "@type": "Organization", "name": "Amazon Web Services" }
       },
       {
@@ -312,17 +283,24 @@
       },
       {
         "@type": "EducationalOccupationalCredential",
-        "name": "AWS Certified Machine Learning - Specialty",
-        "credentialCategory": "certification",
-        "url": "https://www.credly.com/badges/9a89ee8f-55db-44e0-997d-614f7e3b1f9d",
-        "recognizedBy": { "@type": "Organization", "name": "Amazon Web Services" }
-      },
-      {
-        "@type": "EducationalOccupationalCredential",
         "name": "AWS Certified Machine Learning Engineer - Associate",
         "credentialCategory": "certification",
         "url": "https://www.credly.com/badges/967560f4-1cd6-46c0-b578-3eb1f3db700d",
         "recognizedBy": { "@type": "Organization", "name": "Amazon Web Services" }
+      },
+      {
+        "@type": "EducationalOccupationalCredential",
+        "name": "AWS Certified Data Engineer - Associate",
+        "credentialCategory": "certification",
+        "url": "https://www.credly.com/badges/548b2a92-951d-440a-aadd-e9ea1a227a78",
+        "recognizedBy": { "@type": "Organization", "name": "Amazon Web Services" }
+      },
+      {
+        "@type": "EducationalOccupationalCredential",
+        "name": "Claude Certified Associate - Foundations",
+        "credentialCategory": "certification",
+        "url": "https://www.credly.com/badges/17c1078a-8f95-47a9-8a35-6f9468f9a475",
+        "recognizedBy": { "@type": "Organization", "name": "Anthropic" }
       }
     ]
   }
@@ -388,37 +366,20 @@
   <section id="badges">
     <div class="container">
       <h2 class="section-title">Badges — Certificaciones AWS y Anthropic</h2>
-      <p class="section-sub">14 certificaciones AWS —incluidas Solutions Architect, DevOps Engineer y Generative AI Developer a nivel Professional— y Claude Certified Architect de Anthropic.</p>
+      <p class="section-sub">Mi día a día construyendo infraestructura cloud me da la experiencia; las certificaciones de AWS y Anthropic la validan y me llevan a profundizar donde el trabajo no llega.</p>
       <hr class="divider">
       <div class="badges-grid">
         <div class="badge" data-iframe-width="150" data-iframe-height="270" data-share-badge-id="feece8af-5340-4550-8ade-09badb1aa62a" data-share-badge-host="https://www.credly.com"></div>
         <div class="badge" data-iframe-width="150" data-iframe-height="270" data-share-badge-id="9a708c68-4aa1-4bce-8f73-2cc88c1d6a04" data-share-badge-host="https://www.credly.com"></div>
-        <div class="badge" data-iframe-width="150" data-iframe-height="270" data-share-badge-id="8902d4fc-3191-45e8-8014-0bf8af8eeef8" data-share-badge-host="https://www.credly.com"></div>
         <div class="badge" data-iframe-width="150" data-iframe-height="270" data-share-badge-id="6dfebd2c-2da3-413a-9fcb-7db323493552" data-share-badge-host="https://www.credly.com"></div>
-        <div class="badge" data-iframe-width="150" data-iframe-height="270" data-share-badge-id="35d16ca4-dcbe-4157-9798-607511eed3c8" data-share-badge-host="https://www.credly.com"></div>
+        <div class="badge" data-iframe-width="150" data-iframe-height="270" data-share-badge-id="8902d4fc-3191-45e8-8014-0bf8af8eeef8" data-share-badge-host="https://www.credly.com"></div>
+        <div class="badge" data-iframe-width="150" data-iframe-height="270" data-share-badge-id="5beba307-9f22-4571-b6a5-811ed6ef601c" data-share-badge-host="https://www.credly.com"></div>
         <div class="badge" data-iframe-width="150" data-iframe-height="270" data-share-badge-id="72b4f514-bfd9-4792-be84-952b9d17e926" data-share-badge-host="https://www.credly.com"></div>
-        <div class="badge" data-iframe-width="150" data-iframe-height="270" data-share-badge-id="9a89ee8f-55db-44e0-997d-614f7e3b1f9d" data-share-badge-host="https://www.credly.com"></div>
         <div class="badge" data-iframe-width="150" data-iframe-height="270" data-share-badge-id="967560f4-1cd6-46c0-b578-3eb1f3db700d" data-share-badge-host="https://www.credly.com"></div>
-        <div class="badge tt-badge">
-          <div class="tt-badge-body">
-          <div class="tt-badge-inner">
-          <div class="tt-frame">
-            <div class="tt-card">
-              <svg width="64" viewBox="0 0 60 17" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="m20.85 6.38 6.06-.89 2.72-5.49 2.71 5.49 6.06.89-4.39 4.28 1.04 6.03-5.42-2.85-5.43 2.85 1.04-6.03zm33.06 7.17 1.85-.27.82-1.67.83 1.67 1.84.27-1.33 1.31.31 1.83-1.65-.87-1.66.87.32-1.83zm-3.38-3.01-3.61-.52-1.61-3.26-1.62 3.26-3.6.52 2.6 2.55-.61 3.59 3.23-1.69 3.21 1.69-.61-3.59zm-45.19 3.01-1.85-.27-.82-1.67-.83 1.67-1.84.27 1.33 1.31-.31 1.83 1.65-.87 1.65.87-.31-1.83zm3.38-3.01 3.61-.52 1.61-3.26 1.61 3.26 3.61.52-2.6 2.55.61 3.59-3.23-1.69-3.22 1.69.62-3.59z" fill="#fff"/></svg>
-              <span class="tt-title">TOP 3% TALENT</span>
-              <div class="tt-rule"></div>
-              <span class="tt-by">Vetted by</span>
-              <svg viewBox="0 0 108 30" width="100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Toptal"><g clip-rule="evenodd" fill="#fff" fill-rule="evenodd"><path d="m8.11 0 6.71 6.7c.05.05.09.1.15.15l5.85 5.85-9.51 9.46 4.35 4.36-2.91 2.89-6.66-6.66c-.08-.07-.16-.15-.24-.23l-5.85-5.84 9.48-9.43-4.32-4.31zm4.25 10.5c-.09-.02-.18-.02-.26 0-.09.03-.16.07-.32.22l-5.41 5.39c-.16.16-.2.23-.22.31-.03.09-.03.18 0 .26.02.09.07.17.22.32l1.72 1.72c.15.15.22.19.31.22.09.02.17.02.26 0 .09-.03.16-.07.31-.22l5.41-5.39c.16-.15.2-.23.23-.31.02-.09.02-.17 0-.26s-.07-.16-.22-.31l-1.72-1.72c-.15-.16-.23-.2-.31-.23z"/><path d="m62.65 7.76c2.11 0 3.91.82 5.34 2.4 1.46 1.53 2.19 3.64 2.18 6.26 0 2.56-.75 4.8-2.24 6.38-1.47 1.57-3.34 2.37-5.58 2.37-1.93-.01-3.68-.7-4.84-1.89l-.16-.17-.01 6.75-3.82-.01v-.28l.04-21.61h3.8l-.01 2.64c1.25-1.41 3.26-2.84 5.3-2.84zm24.45.06c2.18 0 3.68.49 4.84 1.44 1.11.92 1.7 2.56 1.75 4.29v.26l-.02 11.14h-3.87v-.46c0-.48 0-.97 0-1.47-1.12 1.55-2.68 2.3-4.76 2.3-1.65 0-3.05-.5-4.07-1.43-1.03-.94-1.58-2.23-1.58-3.73.02-2.83 2.02-4.79 5.52-5.4l.27-.05 4.64-.73v-.37c0-.78-.23-1.72-.69-2.11-.47-.4-1.04-.73-2.03-.73-2.73 0-3.29 2.01-3.32 3.02v.09l-3.42.04c0-1.49.69-3.42 2.08-4.63 1.12-.97 2.75-1.42 4.33-1.47h.3zm-14.98-4.36h3.81l-.01 4.56h3.53v3.18l-3.54-.01-.01 8.54c0 .94.19 1.56.6 1.85.43.3 1.3.02 1.3.02l.34 3.32s-1.2.31-1.96.31c-.99 0-1.84-.25-2.49-.75-1.06-.8-1.6-2.2-1.6-4.17l.02-9.12-3.19-3.19 3.2.01zm-22.46 6.8c1.1 1.13 2.41 3.14 2.4 6.26-.01 3.11-1.32 5.11-2.41 6.24-1.5 1.54-3.54 2.42-5.59 2.42-.08 0-.16 0-.25-.01-2.19-.01-4.13-.79-5.75-2.33-1.63-1.55-2.46-3.68-2.46-6.36s.84-4.82 2.47-6.36c1.62-1.53 3.55-2.3 5.75-2.3 2.17-.07 4.29.83 5.84 2.44zm-8.81-7.04v3.77l-7.36.01.02 17.97-3.97-.01v-.34l.03-17.63h-7.51l.01-3.77zm54.68.25 3.42.01v.09l-.03 21.38-3.42-.01v-.1zm-5.71 13.58-3.81.64c-1.86.32-2.72 1.04-2.73 2.3-.01 1.15.81 1.92 2.09 1.99h.16.02c2.44 0 4.17-1.9 4.26-4.67l.01-.22zm-46.02-5.84c-1.28 0-2.39.49-3.29 1.47-.88.96-1.33 2.24-1.33 3.81 0 1.58.45 2.86 1.33 3.82.89.98 2 1.47 3.28 1.48 1.3 0 2.42-.49 3.31-1.47.9-.98 1.35-2.26 1.36-3.81.01-1.56-.45-2.84-1.35-3.82s-2.01-1.48-3.31-1.48zm17.94.12h-.02c-1.28 0-2.34.46-3.24 1.43-.9.94-1.35 2.16-1.36 3.63 0 1.49.45 2.83 1.35 3.8.92.95 1.98 1.42 3.25 1.42 1.29 0 2.38-.48 3.25-1.41.91-.97 1.35-2.3 1.36-3.79 0-1.48-.46-2.7-1.34-3.63-.87-.96-1.96-1.45-3.25-1.45z"/></g></svg>
-              <a class="tt-cta" href="https://www.toptal.com/developers/resume/arturo-delgado#eb1xjG" target="_blank" rel="noopener">Hire me</a>
-            </div>
-          </div>
-          </div>
-          </div>
-          <span class="tt-name"><a href="https://www.toptal.com/developers/resume/arturo-delgado#eb1xjG" target="_blank" rel="noopener">Top 3% Talent</a></span>
-          <div class="tt-issuer">Issuer: Toptal</div>
-          <div class="tt-provided">Provided by Toptal</div>
-        </div>
+        <div class="badge" data-iframe-width="150" data-iframe-height="270" data-share-badge-id="548b2a92-951d-440a-aadd-e9ea1a227a78" data-share-badge-host="https://www.credly.com"></div>
+        <div class="badge" data-iframe-width="150" data-iframe-height="270" data-share-badge-id="17c1078a-8f95-47a9-8a35-6f9468f9a475" data-share-badge-host="https://www.credly.com"></div>
       </div>
+      <p class="badges-more"><a href="https://www.credly.com/users/ajdelgados" target="_blank" rel="noopener">Ver todas mis credenciales en Credly →</a></p>
     </div>
   </section>
   <script type="text/javascript" async src="//cdn.credly.com/assets/utilities/embed.js"></script>
@@ -429,26 +390,63 @@
       <hr class="divider">
       <div class="posts">
         <article class="post">
+          <h3><a href="blog/adoro-kubernetes-y-por-eso-no-siempre-lo-recomiendo.html">Adoro Kubernetes, y por eso no siempre lo recomiendo</a></h3>
+          <p>Uso Kubernetes desde 2019 y di una charla sobre Kyverno en la CNCF. Por eso sé cuándo no recomendarlo: cuándo conviene ECS, Lambda o un simple cron.</p>
+          <div class="post-footer">
+            <a class="read-more" href="blog/adoro-kubernetes-y-por-eso-no-siempre-lo-recomiendo.html">Leer más &rarr;</a>
+            <span class="post-date"><time datetime="2026-11-07">7 de noviembre de 2026</time></span>
+          </div>
+        </article>
+        <article class="post">
           <h3><a href="blog/demasiado-cauteloso-con-la-ia-en-produccion.html">¿Demasiado cauteloso o la IA no debería tener las llaves de producción?</a></h3>
           <p>Uso Claude Code y Copilot todos los días, pero leo cada línea antes de aprobarla. Una reflexión sobre el criterio humano cuando dos horas de downtime cuestan miles de dólares.</p>
-          <a class="read-more" href="blog/demasiado-cauteloso-con-la-ia-en-produccion.html">Leer más &rarr;</a>
+          <div class="post-footer">
+            <a class="read-more" href="blog/demasiado-cauteloso-con-la-ia-en-produccion.html">Leer más &rarr;</a>
+            <span class="post-date"><time datetime="2026-08-30">30 de agosto de 2026</time></span>
+          </div>
         </article>
         <article class="post">
           <h3><a href="blog/diagnostico-de-camara-hikvision-por-rtsp.html">Diagnóstico de cámara Hikvision por RTSP</a></h3>
           <p>Pérdida de paquetes por una fuente insuficiente, error 401 Digest y reproducción forzando TCP: el hilo completo de un diagnóstico con cuatro causas superpuestas.</p>
-          <a class="read-more" href="blog/diagnostico-de-camara-hikvision-por-rtsp.html">Leer más →</a>
+          <div class="post-footer">
+            <a class="read-more" href="blog/diagnostico-de-camara-hikvision-por-rtsp.html">Leer más →</a>
+            <span class="post-date"><time datetime="2026-08-02">2 de agosto de 2026</time></span>
+          </div>
         </article>
         <article class="post">
           <h3><a href="blog/react-con-aws-cognito-para-autenticacion-de-usuario.html">React con AWS Cognito para autenticación de usuario</a></h3>
           <p>Cómo integrar AWS Cognito en una aplicación React para gestionar la autenticación de usuarios de forma segura.</p>
-          <a class="read-more" href="blog/react-con-aws-cognito-para-autenticacion-de-usuario.html">Leer más →</a>
+          <div class="post-footer">
+            <a class="read-more" href="blog/react-con-aws-cognito-para-autenticacion-de-usuario.html">Leer más →</a>
+            <span class="post-date"><time datetime="2020-10-28">28 de octubre de 2020</time></span>
+          </div>
         </article>
         <article class="post">
           <h3><a href="blog/mautic-en-aws-instalacion-con-nginx.html">Mautic en AWS instalación con Nginx</a></h3>
           <p>Guía para instalar y configurar Mautic sobre AWS utilizando Nginx como servidor web.</p>
-          <a class="read-more" href="blog/mautic-en-aws-instalacion-con-nginx.html">Leer más →</a>
+          <div class="post-footer">
+            <a class="read-more" href="blog/mautic-en-aws-instalacion-con-nginx.html">Leer más &rarr;</a>
+            <span class="post-date"><time datetime="2020-09-16">16 de septiembre de 2020</time></span>
+          </div>
+        </article>
+        <article class="post">
+          <h3><a href="blog/nestjs-con-aws-secrets-manager.html">NestJS con AWS Secrets Manager</a></h3>
+          <p>Cómo consumir AWS Secrets Manager desde una aplicación NestJS usando el AWS SDK para manejar credenciales de forma segura.</p>
+          <div class="post-footer">
+            <a class="read-more" href="blog/nestjs-con-aws-secrets-manager.html">Leer más &rarr;</a>
+            <span class="post-date"><time datetime="2020-05-23">23 de mayo de 2020</time></span>
+          </div>
+        </article>
+        <article class="post">
+          <h3><a href="blog/golang-graphql-para-una-api-usando-postgresql.html">Golang GraphQL para una API usando PostgreSQL</a></h3>
+          <p>Construyendo una API GraphQL en Go con Gin, GORM y graphql-go conectada a una base de datos PostgreSQL.</p>
+          <div class="post-footer">
+            <a class="read-more" href="blog/golang-graphql-para-una-api-usando-postgresql.html">Leer más &rarr;</a>
+            <span class="post-date"><time datetime="2020-05-07">7 de mayo de 2020</time></span>
+          </div>
         </article>
       </div>
+      <nav class="pager" aria-label="Paginación del blog" hidden></nav>
     </div>
   </section>
 
@@ -465,5 +463,45 @@
     </div>
   </footer>
 
+  <script>
+    /* Blog pager: 4 cards per page, at most 3 page numbers, plus first, previous,
+       next, and last buttons. The cards stay in the HTML for crawlers. */
+    (function () {
+      var PER_PAGE = 4, WINDOW = 3;
+      var cards = Array.prototype.slice.call(document.querySelectorAll('#blog .posts .post'));
+      var pager = document.querySelector('#blog .pager');
+      var pages = Math.ceil(cards.length / PER_PAGE);
+      if (!pager || pages < 2) return;
+      function button(label, page, aria, disabled) {
+        var b = document.createElement('button');
+        b.type = 'button'; b.textContent = label; b.dataset.page = page;
+        b.setAttribute('aria-label', aria); b.disabled = !!disabled;
+        pager.appendChild(b);
+        return b;
+      }
+      function show(page, scroll) {
+        cards.forEach(function (c, i) { c.hidden = Math.floor(i / PER_PAGE) !== page - 1; });
+        pager.innerHTML = '';
+        var start = Math.max(1, Math.min(page - Math.floor(WINDOW / 2), pages - WINDOW + 1));
+        var end = Math.min(pages, start + WINDOW - 1);
+        button('\u00ab', 1, 'Primera página', page === 1);
+        button('\u2039', page - 1, 'Página anterior', page === 1);
+        for (var n = start; n <= end; n++) {
+          var b = button(String(n), n, 'Página ' + n);
+          b.className = 'page-num';
+          if (n === page) b.setAttribute('aria-current', 'page');
+        }
+        button('\u203a', page + 1, 'Página siguiente', page === pages);
+        button('\u00bb', pages, 'Última página', page === pages);
+        if (scroll) document.getElementById('blog').scrollIntoView({ behavior: 'smooth' });
+      }
+      pager.addEventListener('click', function (e) {
+        var b = e.target.closest('button');
+        if (b && !b.disabled) show(Number(b.dataset.page), true);
+      });
+      pager.hidden = false;
+      show(1, false);
+    })();
+  </script>
 </body>
 </html>

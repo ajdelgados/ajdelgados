@@ -200,14 +200,20 @@ The existing posts were migrated from WordPress. The process to migrate/create o
 
 7. **Link from `index.html`.** In the `#blog` section ("Lo último del Blog"), add a new
    `<article class="post">` as the **first** card (newest first): an `<h3><a>` with the
-   title, a `<p>` summary, and an `<a class="read-more">`. Both links point to
+   title, a `<p>` summary, and a `<div class="post-footer">` that holds the
+   `<a class="read-more">` and a `<span class="post-date"><time datetime="YYYY-MM-DD">` with the
+   post date in Spanish (for example "7 de noviembre de 2026"). Copy an existing card. Both links point to
    `blog/<slug>.html`.
 
-   **The section shows exactly the 4 most recent posts** — when you add one, delete the
-   oldest card so the count stays at 4. The grid is `repeat(2, 1fr)`, so 4 keeps a full
-   2×2 with no orphan card in the last row. Dropping a post from the home page does **not**
-   unpublish it: its page, `sitemap.xml` entry, and `llms.txt` bullet all stay (those lists
-   are complete, not "latest"), so it remains indexable and reachable by URL.
+   **The section lists every post, newest first, with a JS pager of 4 cards per page.** The pager shows at most 3 page numbers (`WINDOW` in the script), between the buttons first («), previous (‹), next (›), and last (»). On screens of 420 px or less, the page numbers are hidden and only « ‹ › » stay.
+   Never delete a card. The inline script at the end of `index.html` hides the cards outside
+   the current page with the `hidden` attribute and builds the pager buttons in
+   `<nav class="pager">`. Without JS, every card is visible and the pager stays hidden, so
+   crawlers always see a link to every post. To change the page size, edit `PER_PAGE` in that
+   script. The Badges grid also changes with the screen width: 3 columns and 9 badges above
+   768 px, 2 columns and the first 6 badges up to 768 px, 1 column and the first 4 badges up to
+   420 px. The CSS selects badges by position (`.badges-grid > :nth-child(n+7)`), because the
+   Credly script replaces each `.badge` div with an iframe that has no class. The `.post` rule sets `display: flex` for the card footer, so the rule `.post[hidden] { display: none; }` must stay, or the pager shows every card.
 
 8. **Add the SEO layer** to the new page (see the SEO section above): canonical, author,
    keywords, robots, full Open Graph + Twitter Card meta, and a `BlogPosting` JSON-LD block.
@@ -272,7 +278,7 @@ The existing posts were migrated from WordPress. The process to migrate/create o
     - **`<meta name="description">` is ≤ 158 chars and identical in all 4 locations.**
     - **At least half the `<h2>`s name the target keyword** (truthfully).
     - The post is listed in both `sitemap.xml` and `llms.txt`.
-    - `index.html` has exactly 4 `<article class="post">` cards, newest first.
+    - `index.html` has one `<article class="post">` card for every file in `blog/`, newest first.
 
 ## Post page structure
 

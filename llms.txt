@@ -16,19 +16,22 @@ Credenciales verificables en Credly, mostradas en la sección
 - AWS Certified Generative AI Developer – Professional
 - AWS Certified Security – Specialty
 - AWS Certified Advanced Networking – Specialty
-- AWS Certified Machine Learning – Specialty
+- AWS Certified Data Engineer – Associate
 - AWS Certified Machine Learning Engineer – Associate
 
 Machine learning e IA generativa:
 
 - Claude Certified Architect – Foundations (Anthropic) — diseño y construcción de
   aplicaciones en producción con Claude Code, el Claude Agent SDK, la Claude API y MCP.
+- Claude Certified Associate – Foundations (Anthropic) — uso de Claude en tareas de
+  negocio: evaluar y refinar su salida, elegir productos y modelos, y usarlo con responsabilidad.
 - AWS Certified Generative AI Developer – Professional
-- AWS Certified Machine Learning – Specialty
+- AWS Certified Data Engineer – Associate
 - AWS Certified Machine Learning Engineer – Associate
 
 ## Blog
 
+- [Adoro Kubernetes, y por eso no siempre lo recomiendo](https://ajdelgados.com/blog/adoro-kubernetes-y-por-eso-no-siempre-lo-recomiendo.html): Adoro Kubernetes, pero no siempre es la respuesta. Cuándo usar Kubernetes, cuándo ECS o Lambda, y cuándo basta un cron, con datos y costo-beneficio.
 - [¿Demasiado cauteloso o la IA no debería tener las llaves de producción?](https://ajdelgados.com/blog/demasiado-cauteloso-con-la-ia-en-produccion.html): Reflexión personal sobre el uso de IA en entornos de producción críticos: por qué leo línea por línea el código que genera Claude Code o Copilot, cómo uso la IA para entender y revisar PR sin delegarle la aprobación, el riesgo de darle a un agente permisos de ejecución en producción, y por qué acumular plugins no sustituye al criterio técnico.
 - [Diagnóstico de cámara Hikvision por RTSP](https://ajdelgados.com/blog/diagnostico-de-camara-hikvision-por-rtsp.html): Diagnóstico de acceso RTSP a una cámara Hikvision: pérdida de paquetes causada por una fuente de alimentación insuficiente, error 401 con autenticación Digest, verificación del codec H.264 por ISAPI y reproducción con ffplay forzando TCP.
 - [React con AWS Cognito para autenticación de usuario](https://ajdelgados.com/blog/react-con-aws-cognito-para-autenticacion-de-usuario.html): Autenticación de usuario con AWS Cognito y un frontend hecho con React JS usando directamente el API de Cognito.
